@@ -29,9 +29,9 @@ public class AdInfoCollector {
         doc.outputSettings().escapeMode(xhtml);
         Element priceElement = doc.select("div[class=price] span[class=amount]").first();
         String text = priceElement.text().replace(" zł", "").replaceAll("\\h+", "");
-        double price = Double.parseDouble(text);
+        double price = StringUtils.isNumeric(text) ?  Double.parseDouble(text) : Double.MIN_VALUE;
         Elements areaElement = doc.select("div[class=attribute] span:contains(Wielkość (m2)) ~ span");
-        double area = StringUtils.isBlank(areaElement.text()) ? 0d : Double.parseDouble(areaElement.text());
+        double area = StringUtils.isBlank(areaElement.text()) ? Double.MIN_VALUE : Double.parseDouble(areaElement.text());
         Elements descriptionElement = doc.select("div[class=description] span[class=pre]");
         String description = descriptionElement.text();
         String location = doc.select("div[class=attribute] span:contains(Lokalizacja) ~ span").text();

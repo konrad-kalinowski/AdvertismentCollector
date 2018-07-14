@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.h2.tools.Server;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -19,13 +21,20 @@ import java.util.List;
 
 
 public class AdCollectorDao {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AdCollectorDao.class);
+    private static final String DUMP_FILE = "dump.sql";
+
     private Server tcpServer;
     private Server webServer;
     private String url;
     private Connection con;
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AdCollectorDao.class);
+
 
     public void initialize() {
+        initialize("/skrypt.sql");
+    }
+
+    public void initialize(String fileName) {
         String paramsString = "-baseDir /tmp/h2-test -tcpPort 8081 -tcpAllowOthers";
         String[] dbParams = paramsString.split(" ");
         try {
@@ -35,29 +44,33 @@ public class AdCollectorDao {
             System.out.println(tcpServer.getStatus());
             System.out.println(webServer.getStatus());
             con = DriverManager.getConnection(url, "sa", "");
-            InputStream sqlFile = AdCollectorDao.class.getResourceAsStream("/skrypt.sql");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(sqlFile));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-            String[] queries = stringBuilder.toString().split(";");
-            for (String query : queries) {
-                Statement st = con.createStatement();
-                st.executeUpdate(query);
-                st.close();
-            }
+            importSql(fileName);
 
         } catch (Exception e) {
             log.error("Failed to initialize server", e);
         }
+    }
 
+    private void importSql(String fileName) throws IOException, SQLException {
+        InputStream sqlFile = AdCollectorDao.class.getResourceAsStream(fileName);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(sqlFile));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line).append("\n");
+        }
+        String[] queries = stringBuilder.toString().split(";");
+        for (String query : queries) {
+            Statement st = con.createStatement();
+            st.executeUpdate(query);
+            st.close();
+        }
     }
 
     public void close() {
         try {
             if (con != null) {
+                dumpToFile(new File(DUMP_FILE));
                 con.close();
             }
         } catch (SQLException e) {
@@ -105,6 +118,16 @@ public class AdCollectorDao {
             return mapper.map(resultSet);
         } catch (SQLException e) {
             throw new IllegalStateException("Query " + query + "execution failed", e);
+        }
+    }
+
+    public void dumpToFile(File file) {
+
+        try (PreparedStatement statement = con.prepareStatement("SCRIPT TO ?")) {
+            statement.setString(1, file.getAbsolutePath());
+            statement.executeQuery();
+        } catch (SQLException e) {
+            log.error("Failed to add advert.", e);
         }
     }
 
