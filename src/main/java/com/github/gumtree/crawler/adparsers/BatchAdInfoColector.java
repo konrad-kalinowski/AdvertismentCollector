@@ -1,4 +1,4 @@
-package com.github.gumtree.crawler.parser;
+package com.github.gumtree.crawler.adparsers;
 
 import com.github.gumtree.crawler.model.Advertisement;
 import org.slf4j.Logger;
@@ -11,9 +11,11 @@ public class BatchAdInfoColector {
 
     private static final Logger log = LoggerFactory.getLogger(BatchAdInfoColector.class);
     private final AdInfoCollector adInfoCollector;
+    private final JsoupProvider jsoupProvider;
 
-    public BatchAdInfoColector(AdInfoCollector adInfoCollector) {
+    public BatchAdInfoColector(AdInfoCollector adInfoCollector, JsoupProvider jsoupProvider) {
         this.adInfoCollector = adInfoCollector;
+        this.jsoupProvider = jsoupProvider;
     }
 
     public List<Advertisement> collectAdvertsDetails(List<String> advertLinks, int inactivePeriodOfSeconds) {
@@ -21,7 +23,7 @@ public class BatchAdInfoColector {
         try {
             for (String advertLink : advertLinks) {
                 log.debug("Fetching adverisment info {}", advertLink);
-                Advertisement advertisement = adInfoCollector.collectAdInfo(advertLink);
+                Advertisement advertisement = adInfoCollector.collectAdInfo(jsoupProvider.connect(advertLink));
                 adverts.add(advertisement);
                 try {
                     Thread.sleep(1000 * inactivePeriodOfSeconds);

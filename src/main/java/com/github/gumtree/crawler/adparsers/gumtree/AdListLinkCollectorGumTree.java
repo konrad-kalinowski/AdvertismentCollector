@@ -1,5 +1,7 @@
-package com.github.gumtree.crawler.parser;
+package com.github.gumtree.crawler.adparsers.gumtree;
 
+import com.github.gumtree.crawler.adparsers.GumTreeLinkUtil;
+import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -11,18 +13,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AdListLinkCollector {
+public class AdListLinkCollectorGumTree {
 
-    private static final Logger log = LoggerFactory.getLogger(AdListLinkCollector.class);
+    private static final Logger log = LoggerFactory.getLogger(AdListLinkCollectorGumTree.class);
+    private final JsoupProvider jsoupProvider;
+
+    public AdListLinkCollectorGumTree(JsoupProvider jsoupProvider) {
+        this.jsoupProvider = jsoupProvider;
+    }
 
 
     public List<String> getAdvertsLinks(String sectionLink, int depthLimit,int inactivePeriodOfSeconds) {
-        Document document = JsoupProvider.connect(sectionLink);
+        Document document = jsoupProvider.connect(sectionLink);
         return getLinks(document, depthLimit,inactivePeriodOfSeconds);
     }
 
     public List<String> getAdvertsLinks(File file, int depthLimit,int inactivePeriodOfSeconds ) {
-        Document document = JsoupProvider.parseFile(file);
+        Document document = jsoupProvider.parseFile(file);
         return getLinks(document, depthLimit,inactivePeriodOfSeconds);
     }
 
@@ -46,7 +53,7 @@ public class AdListLinkCollector {
                 log.error("Interrupted");
             }
             log.debug("Fetching next page {}",nextPageLink);
-            doc = JsoupProvider.connect(nextPageLink);
+            doc = jsoupProvider.connect(nextPageLink);
 
         }
         return allCollectedLinks;

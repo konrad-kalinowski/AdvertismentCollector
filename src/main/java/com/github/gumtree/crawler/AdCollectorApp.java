@@ -1,10 +1,11 @@
 package com.github.gumtree.crawler;
 
+import com.github.gumtree.crawler.adparsers.BatchAdInfoColector;
+import com.github.gumtree.crawler.adparsers.JsoupProvider;
+import com.github.gumtree.crawler.adparsers.gumtree.AdInfoCollectorGumTree;
+import com.github.gumtree.crawler.adparsers.gumtree.AdListLinkCollectorGumTree;
 import com.github.gumtree.crawler.db.AdCollectorDao;
 import com.github.gumtree.crawler.model.Advertisement;
-import com.github.gumtree.crawler.parser.AdInfoCollector;
-import com.github.gumtree.crawler.parser.AdListLinkCollector;
-import com.github.gumtree.crawler.parser.BatchAdInfoColector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ public class AdCollectorApp {
     public static final int INACTIVE_PERIOD_SECONDS = 1;
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         String importFile = "";
         for (int i = 0; args != null && i < args.length; i++) {
             String a = args[i];
@@ -26,27 +27,31 @@ public class AdCollectorApp {
                 importFile = args[++i];
             }
         }
-        AdCollectorDao adCollectorDao = new AdCollectorDao();
-        if(!importFile.isEmpty()){
-            adCollectorDao.initialize(importFile);
-        }else{
-            adCollectorDao.initialize();
-            AdListLinkCollector adListLinkCollector = new AdListLinkCollector();
-            List<String> advertsLinks = adListLinkCollector.getAdvertsLinks("https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/" +
-                    "krakow/v1c9073l3200208p1", 1, INACTIVE_PERIOD_SECONDS);
-            BatchAdInfoColector batchAdInfoColector = new BatchAdInfoColector(new AdInfoCollector());
-            List<Advertisement> advertisements = batchAdInfoColector.collectAdvertsDetails(advertsLinks, INACTIVE_PERIOD_SECONDS);
-            adCollectorDao.addAdverts(advertisements);
-        }
+
+        AdCollectorDao adCollectorDao = null;
         try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
+            adCollectorDao = new AdCollectorDao();
+            if (!importFile.isEmpty()) {
+                adCollectorDao.initialize(importFile);
+            } else {
+                JsoupProvider jsoupProvider = new JsoupProvider();
+                adCollectorDao.initialize();
+                AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProvider);
+                List<String> advertsLinks = adListLinkCollectorGumTree.getAdvertsLinks("https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/" +
+                        "krakow/v1c9073l3200208p1", 1, INACTIVE_PERIOD_SECONDS);
+                BatchAdInfoColector batchAdInfoColector = new BatchAdInfoColector(new AdInfoCollectorGumTree(jsoupProvider), jsoupProvider);
+                List<Advertisement> advertisements = batchAdInfoColector.collectAdvertsDetails(advertsLinks, INACTIVE_PERIOD_SECONDS);
+                adCollectorDao.addAdverts(advertisements);
+            }
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            if (adCollectorDao != null) {
+                adCollectorDao.close();
+            }
         }
-
-        adCollectorDao.close();
-
-
-
     }
 }
