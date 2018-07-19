@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import static com.github.gumtree.crawler.adparsers.GumTreeLinkUtil.GUMTREE_DOMAIN;
+import static com.github.gumtree.crawler.adparsers.Domain.GUMTREE_DOMAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;

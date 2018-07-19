@@ -1,6 +1,6 @@
 package com.github.gumtree.crawler.adparsers.gumtree;
 
-import com.github.gumtree.crawler.adparsers.GumTreeLinkUtil;
+import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -40,13 +40,13 @@ public class AdListLinkCollectorGumTree {
             Elements linkElements = doc.select("div[class=title] a[href]");
             List<String> advertLinks = linkElements.stream()
                     .map(path -> path.attr("href"))
-                    .map(path -> GumTreeLinkUtil.getFullLink(path))
+                    .map(path -> Domain.getFullLink(path))
                     .collect(Collectors.toList());
             log.debug("Collected {} advert links", advertLinks.size());
             allCollectedLinks.addAll(advertLinks);
             Element nextPageLinkElement = doc.select("div[class=pagination]  a[class=next follows]").first();
             String nextPageLink = nextPageLinkElement.attr("href");
-            nextPageLink = GumTreeLinkUtil.getFullLink(nextPageLink);
+            nextPageLink = Domain.getFullLink(nextPageLink);
             try {
                 Thread.sleep(inactivePeriodOfSeconds * 1000);
             } catch (InterruptedException e) {
