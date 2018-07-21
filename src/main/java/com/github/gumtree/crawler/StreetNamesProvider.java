@@ -6,7 +6,6 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,6 +55,9 @@ public class StreetNamesProvider {
             for (CSVRecord record : records) {
                 String street = (record.get("NAZWA_1"));
                 int citySym = Integer.parseInt(record.get("SYM"));
+                if(!record.get("NAZWA_2").isEmpty()){
+                    street = record.get("NAZWA_2") + " " + street;
+                }
 
                 if (citySym == citySymbol) {
                     streets.add(street);
@@ -66,6 +68,12 @@ public class StreetNamesProvider {
         }
         return streets;
 
+    }
+
+    public List<String> trimStreetNames(List<String> streetsFound) {
+        ArrayList<String> trimStreetNames = new ArrayList<>();
+
+        return trimStreetNames;
     }
 }
 

@@ -1,6 +1,8 @@
 package com.github.gumtree.crawler.adparsers.olx;
 
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
+import com.github.gumtree.crawler.db.AdCollectorDao;
+import com.github.gumtree.crawler.model.Advertisement;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

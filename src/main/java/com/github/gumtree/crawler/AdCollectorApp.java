@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 
 public class AdCollectorApp {
@@ -38,7 +39,7 @@ public class AdCollectorApp {
                 adCollectorDao.initialize();
                 AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProvider);
                 List<String> advertsLinks = adListLinkCollectorGumTree.getAdvertsLinks("https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/" +
-                        "krakow/v1c9073l3200208p1", 1, INACTIVE_PERIOD_SECONDS);
+                        "krakow/v1c9073l3200208p1", 2, INACTIVE_PERIOD_SECONDS);
                 BatchAdInfoColector batchAdInfoColector = new BatchAdInfoColector(new AdInfoCollectorGumTree(jsoupProvider), jsoupProvider);
                 List<Advertisement> advertisements = batchAdInfoColector.collectAdvertsDetails(advertsLinks, INACTIVE_PERIOD_SECONDS);
                 adCollectorDao.addAdverts(advertisements);

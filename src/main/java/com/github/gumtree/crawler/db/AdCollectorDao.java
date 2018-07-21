@@ -103,7 +103,6 @@ public class AdCollectorDao {
 
     public void addAdverts(List<Advertisement> advertisements) {
         for (Advertisement advertisement : advertisements) {
-            this.advLinkChecker(advertisement.getLink());
             this.addAdvert(advertisement);
         }
     }
@@ -131,16 +130,5 @@ public class AdCollectorDao {
             log.error("Failed to add advert.", e);
         }
     }
-
-    public boolean advLinkChecker(String link) {
-        try (Statement statement = con.createStatement()) {
-            boolean execute = statement.execute(String.format("SELECT FROM * ADVERTS WHERE LINK LIKE '%s'", link));
-            return execute;
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to connect to db",e);
-        }
-    }
-
-
 }
 

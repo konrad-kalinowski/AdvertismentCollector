@@ -16,6 +16,17 @@ class StreetNamesProviderTest {
         List<String> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
         Assertions.assertThat(streets).isNotEmpty();
         Assertions.assertThat(streets.size()).isEqualTo(492);
+        Assertions.assertThat(streets).contains("Czyżyńska");
+        for (String street : streets) {
+            System.out.println(street);
+        }
+
+//        List<String> strings = streetNamesProvider.trimStreetNames(streets);
+//        for (String string : strings) {
+//            System.out.println(string);
+//        }
 
     }
+
+
 }
