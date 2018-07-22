@@ -33,7 +33,7 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                         .build());
             }
         } catch (SQLException e) {
-            log.error("Failed while mapping to books list", e);
+            log.error("Failed while mapping to advertisement list", e);
         }
         return advertisements;
 

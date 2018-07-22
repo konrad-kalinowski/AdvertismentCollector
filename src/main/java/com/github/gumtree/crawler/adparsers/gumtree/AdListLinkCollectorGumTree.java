@@ -1,6 +1,8 @@
 package com.github.gumtree.crawler.adparsers.gumtree;
 
+import com.github.gumtree.crawler.adparsers.AdLinksCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
+import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -8,33 +10,21 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AdListLinkCollectorGumTree {
+public class AdListLinkCollectorGumTree extends AdLinksCollector {
 
     private static final Logger log = LoggerFactory.getLogger(AdListLinkCollectorGumTree.class);
-    private final JsoupProvider jsoupProvider;
 
-    public AdListLinkCollectorGumTree(JsoupProvider jsoupProvider) {
-        this.jsoupProvider = jsoupProvider;
+    public AdListLinkCollectorGumTree(JsoupProvider jsoupProvider, DuplicatedLinkChecker duplicatedLinkChecker) {
+        super(jsoupProvider, duplicatedLinkChecker);
     }
 
-
-    public List<String> getAdvertsLinks(String sectionLink, int depthLimit,int inactivePeriodOfSeconds) {
-        Document document = jsoupProvider.connect(sectionLink);
-        return getLinks(document, depthLimit,inactivePeriodOfSeconds);
-    }
-
-    public List<String> getAdvertsLinks(File file, int depthLimit,int inactivePeriodOfSeconds ) {
-        Document document = jsoupProvider.parseFile(file);
-        return getLinks(document, depthLimit,inactivePeriodOfSeconds);
-    }
-
-
-    private List<String> getLinks(Document doc, int depthLimit, int inactivePeriodOfSeconds) {
+    @Override
+    protected List<String> getLinks(Document doc, int depthLimit, int inactivePeriodOfSeconds) {
         List<String> allCollectedLinks = new ArrayList<>();
         for (int i = 0; i < depthLimit; i++) {
             Elements linkElements = doc.select("div[class=title] a[href]");
@@ -43,7 +33,8 @@ public class AdListLinkCollectorGumTree {
                     .map(path -> Domain.getFullLink(path))
                     .collect(Collectors.toList());
             log.debug("Collected {} advert links", advertLinks.size());
-            allCollectedLinks.addAll(advertLinks);
+            Set<String> nonParsedLinks = getNonParsedLinks(advertLinks);
+            allCollectedLinks.addAll(nonParsedLinks);
             Element nextPageLinkElement = doc.select("div[class=pagination]  a[class=next follows]").first();
             String nextPageLink = nextPageLinkElement.attr("href");
             nextPageLink = Domain.getFullLink(nextPageLink);
@@ -52,7 +43,7 @@ public class AdListLinkCollectorGumTree {
             } catch (InterruptedException e) {
                 log.error("Interrupted");
             }
-            log.debug("Fetching next page {}",nextPageLink);
+            log.debug("Fetching next page {}", nextPageLink);
             doc = jsoupProvider.connect(nextPageLink);
 
         }

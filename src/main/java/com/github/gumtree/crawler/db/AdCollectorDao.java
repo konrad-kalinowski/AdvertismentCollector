@@ -1,5 +1,6 @@
 package com.github.gumtree.crawler.db;
 
+import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.model.Advertisement;
 import com.github.gumtree.crawler.db.mappers.AdvertisementMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -129,6 +131,10 @@ public class AdCollectorDao {
         } catch (SQLException e) {
             log.error("Failed to add advert.", e);
         }
+    }
+
+    public List<String> getStoredLinks() {
+        return executeQuery("SELECT LINK FROM ADVERTS", new LinksMapper());
     }
 }
 

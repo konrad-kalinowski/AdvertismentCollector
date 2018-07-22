@@ -8,11 +8,23 @@
             </Pattern>
         </layout>
     </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>locations.log</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
 
-    <logger name="com.github.gumtree.crawler" level="debug" />
+    <logger name="com.github.gumtree.crawler" level="debug"/>
+
+    <logger name="locations" level="info" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
 
     <root level="error">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>

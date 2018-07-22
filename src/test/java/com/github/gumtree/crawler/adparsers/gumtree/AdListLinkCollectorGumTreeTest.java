@@ -1,5 +1,6 @@
 package com.github.gumtree.crawler.adparsers.gumtree;
 
+import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.gumtree.crawler.adparsers.Domain.GUMTREE_DOMAIN;
@@ -22,9 +24,9 @@ class AdListLinkCollectorGumTreeTest {
     @Test
     public void shouldFetchLinksFromAdvert() throws URISyntaxException {
         JsoupProvider jsoupProviderSpy = spy(new JsoupProvider());
-        doReturn(mock(Document.class) ).when(jsoupProviderSpy).connect(any());
+        doReturn(mock(Document.class)).when(jsoupProviderSpy).connect(any());
 
-        AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProviderSpy);
+        AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProviderSpy, new DuplicatedLinkChecker(Collections.emptyList()));
         URL sectionsIo = AdListLinkCollectorGumTreeTest.class.getResource("/sections.html");
         File htmlFile = new File(sectionsIo.toURI());
         List<String> advertsLinks = adListLinkCollectorGumTree.getAdvertsLinks(htmlFile, 1, 0);
