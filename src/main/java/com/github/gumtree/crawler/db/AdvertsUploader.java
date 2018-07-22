@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class AdvertsUploader implements OnBatchReadyListener {
+public class AdvertsUploader {
     private static final Logger log = LoggerFactory.getLogger(AdvertsUploader.class);
     private final AdCollectorDao adCollectorDao;
 
@@ -15,8 +15,7 @@ public class AdvertsUploader implements OnBatchReadyListener {
         this.adCollectorDao = adCollectorDao;
     }
 
-    @Override
-    public void onBatchReady(List<Advertisement> batch) {
+    public void uploadAdverts(List<Advertisement> batch) {
         log.info("Adding {} adverts to db", batch.size());
         adCollectorDao.addAdverts(batch);
     }

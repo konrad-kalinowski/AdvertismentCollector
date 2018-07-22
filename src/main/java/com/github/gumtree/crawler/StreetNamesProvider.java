@@ -12,7 +12,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class StreetNamesProvider {
     private static final Logger log = LoggerFactory.getLogger(StreetNamesProvider.class);
@@ -43,9 +45,9 @@ public class StreetNamesProvider {
         throw new IllegalArgumentException("Did not find any city for given args.");
     }
 
-    public List<String> findStreets(int citySymbol) {
+    public Set<String> findStreets(int citySymbol) {
         InputStream addressResource = StreetNamesProvider.class.getResourceAsStream("/ULIC_Adresowy_2018-07-18.csv");
-        ArrayList<String> streets = new ArrayList<>();
+        Set<String> streets = new HashSet<>();
         try (Reader reader = new InputStreamReader(addressResource, StandardCharsets.UTF_8)) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader()
                     .withQuote(null)
@@ -60,7 +62,7 @@ public class StreetNamesProvider {
                 }
 
                 if (citySym == citySymbol) {
-                    streets.add(street);
+                    streets.add(street.toLowerCase());
                 }
             }
         } catch (IOException e) {
@@ -68,12 +70,6 @@ public class StreetNamesProvider {
         }
         return streets;
 
-    }
-
-    public List<String> trimStreetNames(List<String> streetsFound) {
-        ArrayList<String> trimStreetNames = new ArrayList<>();
-
-        return trimStreetNames;
     }
 }
 

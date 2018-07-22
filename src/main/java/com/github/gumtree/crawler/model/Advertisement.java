@@ -7,6 +7,7 @@ public class Advertisement {
     private final String description;
     private final String location;
     private final double area;
+    private String address;
 
 
     private Advertisement(String title, String link, double price, String description, String location, double area) {
@@ -16,6 +17,7 @@ public class Advertisement {
         this.description = description;
         this.location = location;
         this.area = area;
+        this.address = "not set";
     }
 
     public String getTitle() {
@@ -40,6 +42,10 @@ public class Advertisement {
 
     public double getArea() {
         return area;
+    }
+
+    public void setAddress(String locationInDesc) {
+        this.address = locationInDesc;
     }
 
     public static class AdvertBuilder {
