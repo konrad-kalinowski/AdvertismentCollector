@@ -1,6 +1,7 @@
 package com.github.gumtree.crawler.db.mappers;
 
 import com.github.gumtree.crawler.model.Advertisement;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
     private static final Logger log = LoggerFactory.getLogger(AdvertisementMapper.class);
@@ -25,11 +27,14 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 String description = resultSet.getString("ADVERTS.DESCRIPTION");
                 String location = resultSet.getString("ADVERTS.LOCATION");
                 double area = resultSet.getDouble("ADVERTS.AREA");
-                advertisements.add(new Advertisement.AdvertBuilder(title,link)
+                String addresses = resultSet.getString("ADVERTS.ADDRESSES");
+                Set<String> addressesSet = Sets.newHashSet(addresses.split(","));
+                advertisements.add(new Advertisement.AdvertBuilder(title, link)
                         .price(price)
                         .description(description)
                         .location(location)
                         .area(area)
+                        .addresses(addressesSet)
                         .build());
             }
         } catch (SQLException e) {

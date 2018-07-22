@@ -1,11 +1,11 @@
 package com.github.gumtree.crawler.db;
 
-import com.github.gumtree.crawler.db.mappers.LinksMapper;
-import com.github.gumtree.crawler.model.Advertisement;
 import com.github.gumtree.crawler.db.mappers.AdvertisementMapper;
+import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
-import org.slf4j.LoggerFactory;
+import com.github.gumtree.crawler.model.Advertisement;
 import org.h2.tools.Server;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,8 +18,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class AdCollectorDao {
@@ -88,7 +88,7 @@ public class AdCollectorDao {
     }
 
     public void addAdvert(Advertisement advertisement) {
-        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?)";
+        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?)";
         try (PreparedStatement statement = con.prepareStatement(query)) {
             statement.setString(1, advertisement.getTitle());
             statement.setString(2, advertisement.getLink());
@@ -96,6 +96,7 @@ public class AdCollectorDao {
             statement.setString(4, advertisement.getDescription());
             statement.setString(5, advertisement.getLocation());
             statement.setDouble(6, advertisement.getArea());
+            statement.setString(7, advertisement.getAddresses().stream().collect(Collectors.joining()));
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -136,5 +137,7 @@ public class AdCollectorDao {
     public List<String> getStoredLinks() {
         return executeQuery("SELECT LINK FROM ADVERTS", new LinksMapper());
     }
+
+
 }
 

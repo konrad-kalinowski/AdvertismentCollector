@@ -1,5 +1,8 @@
 package com.github.gumtree.crawler.model;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class Advertisement {
     private final String title;
     private final String link;
@@ -7,17 +10,17 @@ public class Advertisement {
     private final String description;
     private final String location;
     private final double area;
-    private String address;
+    private Set<String> addresses;
 
 
-    private Advertisement(String title, String link, double price, String description, String location, double area) {
+    private Advertisement(String title, String link, double price, String description, String location, double area, Set<String> addresses) {
         this.title = title;
         this.link = link;
         this.price = price;
         this.description = description;
         this.location = location;
         this.area = area;
-        this.address = "not set";
+        this.addresses = addresses == null ? Collections.EMPTY_SET : this.addresses;
     }
 
     public String getTitle() {
@@ -44,8 +47,12 @@ public class Advertisement {
         return area;
     }
 
-    public void setAddress(String locationInDesc) {
-        this.address = locationInDesc;
+    public void setpossibleaddresses(Set<String> locationInDesc) {
+        this.addresses = locationInDesc;
+    }
+
+    public Set<String> getAddresses() {
+        return addresses;
     }
 
     public static class AdvertBuilder {
@@ -55,6 +62,7 @@ public class Advertisement {
         private String description;
         private String location;
         private double area;
+        private Set<String> addresses;
 
         public AdvertBuilder(String title, String link) {
             this.title = title;
@@ -82,8 +90,13 @@ public class Advertisement {
 
         }
 
+        public AdvertBuilder addresses(Set<String> addresses) {
+            this.addresses = addresses;
+            return this;
+        }
+
         public Advertisement build() {
-            return new Advertisement(title, link, price, description, location, area);
+            return new Advertisement(title, link, price, description, location, area, addresses);
         }
 
     }
