@@ -1,6 +1,7 @@
 package com.github.gumtree.crawler.adparsers.olx;
 
 import com.github.gumtree.crawler.adparsers.AdInfoCollector;
+import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,11 @@ public class AdInfoCollectorOlx implements AdInfoCollector {
 
     public AdInfoCollectorOlx(JsoupProvider jsoupProvider) {
         this.jsoupProvider=jsoupProvider;
+    }
+
+    @Override
+    public boolean canProcess(String advertLink) {
+        return advertLink.startsWith(Domain.OLX_DOMAIN);
     }
 
     public Advertisement collectInfo(File file){

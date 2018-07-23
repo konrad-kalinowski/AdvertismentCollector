@@ -34,5 +34,7 @@ public abstract class AdLinksCollector {
 
 
     protected abstract List<String> getLinks(Document document, int depthLimit, int inactivePeriodOfSeconds);
+
+    protected abstract boolean canProcess(String sectionLink);
 }
 

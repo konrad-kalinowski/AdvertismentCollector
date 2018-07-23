@@ -1,5 +1,6 @@
 package com.github.gumtree.crawler.adparsers.olx;
 
+import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.assertj.core.api.Assertions;
@@ -31,7 +32,8 @@ class AdListLinkCollectorOlxTest {
 
         Assertions.assertThat(advertsLinks).contains("https://www.olx.pl/oferta/mieszkanie-przy-umk-na-ul-falata" +
                 "-bez-posrednika-po-remoncie-CID3-IDwJGeZ.html#f3c4691bd2;promoted");
-        Assertions.assertThat(advertsLinks.size()).isEqualTo(35);
+        Assertions.assertThat(advertsLinks.size()).isEqualTo(26);
+        Assertions.assertThat(advertsLinks).allMatch(link -> link.startsWith(Domain.OLX_DOMAIN));
 
 
     }

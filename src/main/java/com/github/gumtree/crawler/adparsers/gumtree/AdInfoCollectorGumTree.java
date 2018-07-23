@@ -1,6 +1,7 @@
 package com.github.gumtree.crawler.adparsers.gumtree;
 
 import com.github.gumtree.crawler.adparsers.AdInfoCollector;
+import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,11 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
 
     public AdInfoCollectorGumTree(JsoupProvider jsoupProvider) {
         this.jsoupProvider = jsoupProvider;
+    }
+
+    @Override
+    public boolean canProcess(String advertLink) {
+        return advertLink.startsWith(Domain.GUMTREE_DOMAIN);
     }
 
     public Advertisement collectInfo(File file){

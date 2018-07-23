@@ -22,6 +22,9 @@ public class Advertisement {
         this.area = area;
         this.addresses = addresses == null ? Collections.EMPTY_SET : this.addresses;
     }
+    public static AdvertBuilder builder(String title, String link){
+        return new AdvertBuilder(title, link);
+    }
 
     public String getTitle() {
         return title;

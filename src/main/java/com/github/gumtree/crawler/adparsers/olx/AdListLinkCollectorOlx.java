@@ -1,6 +1,7 @@
 package com.github.gumtree.crawler.adparsers.olx;
 
 import com.github.gumtree.crawler.adparsers.AdLinksCollector;
+import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import org.jsoup.nodes.Document;
@@ -23,12 +24,18 @@ public class AdListLinkCollectorOlx extends AdLinksCollector {
     }
 
     @Override
+    protected boolean canProcess(String sectionLink) {
+        return sectionLink.startsWith(Domain.OLX_DOMAIN);
+    }
+
+    @Override
     protected List<String> getLinks(Document document, int depthLimit, int inactivePeriodOfSeconds) {
         List<String> allCollectedLinks = new ArrayList<>();
         for (int i = 0; i < depthLimit; i++) {
             Elements linkElements = document.select("td[class=offer] h3 a");
             List<String> advertLinks = linkElements.stream()
                     .map(path -> path.attr("href"))
+                    .filter(link -> link.startsWith(Domain.OLX_DOMAIN))
                     .collect(Collectors.toList());
             log.debug("Collected {} advert links", advertLinks.size());
             Set<String> uniqueLinks = getNonParsedLinks(advertLinks);
@@ -47,7 +54,6 @@ public class AdListLinkCollectorOlx extends AdLinksCollector {
         }
         return allCollectedLinks;
     }
-
 
 }
 

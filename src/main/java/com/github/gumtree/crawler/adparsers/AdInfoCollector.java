@@ -8,4 +8,5 @@ import java.io.File;
 public interface AdInfoCollector {
     Advertisement collectAdInfo(Document document);
 
+    boolean canProcess(String advertLink);
 }

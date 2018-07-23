@@ -23,6 +23,12 @@ public class AdListLinkCollectorGumTree extends AdLinksCollector {
         super(jsoupProvider, duplicatedLinkChecker);
     }
 
+
+    @Override
+    protected boolean canProcess(String sectionLink) {
+        return sectionLink.startsWith(Domain.GUMTREE_DOMAIN);
+    }
+
     @Override
     protected List<String> getLinks(Document doc, int depthLimit, int inactivePeriodOfSeconds) {
         List<String> allCollectedLinks = new ArrayList<>();
@@ -49,4 +55,5 @@ public class AdListLinkCollectorGumTree extends AdLinksCollector {
         }
         return allCollectedLinks;
     }
+
 }

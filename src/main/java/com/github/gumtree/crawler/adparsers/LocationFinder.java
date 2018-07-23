@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 public class LocationFinder {
+    private static final Logger log = LoggerFactory.getLogger(LocationFinder.class);
+
     private static final Logger locations = LoggerFactory.getLogger("locations");
 
     public static final String SENTENCE_SPLIT_REGEX = "(?<!\\w\\.\\w.)(?<!\\s[a-zA-Z]{2}\\.)(?<=\\.|\\?)\\s";
@@ -30,8 +32,7 @@ public class LocationFinder {
         List<String> sentences = Arrays.asList(description.split(SENTENCE_SPLIT_REGEX));
         for (String sentence : sentences) {
             List<String> words = Arrays.asList(sentence
-                    .replace(".", "")
-                    .replace(", ", " ")
+                    .replaceAll("[.,()]", "")
                     .split(" "));
             for (int i = 0; i < words.size(); i++) {
                 if (STREET_PREFIXES.contains(words.get(i))) {
@@ -39,7 +40,9 @@ public class LocationFinder {
                     locations.info("{},{}", location, sentence);
                     List<String> inflections = inflectionsFinder.findInflections(location);
                     String street = findStreet(inflections);
-                    locationFound.add(street);
+                    if (!street.isEmpty()) {
+                        locationFound.add(street);
+                    }
                 }
             }
         }
@@ -53,7 +56,8 @@ public class LocationFinder {
                 return inflection;
             }
         }
-        throw new IllegalArgumentException("Couldn't find street name " + inflections);
+        log.info("Couldn't find street name inflections {}", inflections);
+        return "";
     }
 
 }

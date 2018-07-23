@@ -13,13 +13,13 @@ import java.util.concurrent.TimeUnit;
 public class BatchAdInfoCollector {
 
     private static final Logger log = LoggerFactory.getLogger(BatchAdInfoCollector.class);
-    private final AdInfoCollector adInfoCollector;
+    private final List<AdInfoCollector> adInfoCollector;
     private final JsoupProvider jsoupProvider;
     private final List<OnBatchReadyListener> batchReadyListeners;
     private final int batchSize;
 
-    public BatchAdInfoCollector(AdInfoCollector adInfoCollector, JsoupProvider jsoupProvider, List<OnBatchReadyListener> batchReadyListeners, int batchSize) {
-        this.adInfoCollector = adInfoCollector;
+    public BatchAdInfoCollector(List<AdInfoCollector> adInfoCollectors, JsoupProvider jsoupProvider, List<OnBatchReadyListener> batchReadyListeners, int batchSize) {
+        this.adInfoCollector = adInfoCollectors;
         this.jsoupProvider = jsoupProvider;
         this.batchReadyListeners = batchReadyListeners;
         this.batchSize = batchSize;
@@ -33,6 +33,10 @@ public class BatchAdInfoCollector {
             for (String advertLink : partition) {
                 try {
                     log.debug("Fetching adverisment info {}", advertLink);
+                    AdInfoCollector adInfoCollector = this.adInfoCollector.stream()
+                            .filter(collector -> collector.canProcess(advertLink))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Failed to find suitable advert collector for link " + advertLink));
                     Advertisement advertisement = adInfoCollector.collectAdInfo(jsoupProvider.connect(advertLink));
                     advertBatch.add(advertisement);
                     Uninterruptibles.sleepUninterruptibly(inactivePeriodOfSeconds, TimeUnit.SECONDS);
