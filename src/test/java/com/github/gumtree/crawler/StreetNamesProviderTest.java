@@ -1,8 +1,10 @@
 package com.github.gumtree.crawler;
 
+import com.github.gumtree.crawler.model.StreetType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Set;
 
 class StreetNamesProviderTest {
@@ -10,14 +12,14 @@ class StreetNamesProviderTest {
     @Test
     void findCitySymbolInSincDB() {
         StreetNamesProvider streetNamesProvider = new StreetNamesProvider();
-        int citySymbolInSincDB = streetNamesProvider.findCitySymbolInSincDB(12, 61, 05, "Kraków");
-        Assertions.assertThat(citySymbolInSincDB).isEqualTo(951327);
+        Set<Integer> citySymbolInSincDB = streetNamesProvider.findCitySymbolInSincDB(12, 61,  "Kraków");
+        Assertions.assertThat(citySymbolInSincDB).containsExactlyInAnyOrder(950718, 951327, 950470, 950960);
 
-        Set<String> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
+        Map<StreetType, Set<String>> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
         Assertions.assertThat(streets).isNotEmpty();
-        Assertions.assertThat(streets.size()).isEqualTo(492);
-        Assertions.assertThat(streets).contains("czyżyńska");
-        Assertions.assertThat(streets).contains("ludwika zieleniewskiego");
+        Assertions.assertThat(streets.size()).isEqualTo(3);
+        Assertions.assertThat(streets.get(StreetType.STREET)).contains("czyżyńska");
+        Assertions.assertThat(streets.get(StreetType.STREET)).contains("ludwika zieleniewskiego");
     }
 
 

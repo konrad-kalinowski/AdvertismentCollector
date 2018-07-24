@@ -14,6 +14,7 @@ import com.github.gumtree.crawler.adparsers.olx.AdListLinkCollectorOlx;
 import com.github.gumtree.crawler.adparsers.oto_dom.AdListLinkCollectorOtoDom;
 import com.github.gumtree.crawler.db.AdCollectorDao;
 import com.github.gumtree.crawler.db.AdvertsUploader;
+import com.github.gumtree.crawler.model.StreetType;
 import com.github.gumtree.crawler.util.InflectionsFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -70,9 +72,9 @@ public class AdCollectorApp {
                 AdvertsUploader advertsUploader = new AdvertsUploader(adCollectorDao);
                 StreetNamesProvider streetNamesProvider = new StreetNamesProvider();
                 String city = "Kraków";
-                int citySymbolInSincDB = streetNamesProvider.findCitySymbolInSincDB(12, 61, 05, city);
+                Set<Integer> citySymbolInSincDB = streetNamesProvider.findCitySymbolInSincDB(12, 61, city);
                 log.debug("{} city symbol = {}", city, citySymbolInSincDB);
-                Set<String> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
+                Map<StreetType, Set<String>> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
                 log.debug("Initialized with {} streets {}", streets.size(), streets);
 
                 LocationEnricher locationEnricher = new LocationEnricher(new LocationFinder(streets, new InflectionsFinder()), advertsUploader);

@@ -1,5 +1,7 @@
 package com.github.gumtree.crawler;
 
+import com.github.gumtree.crawler.model.StreetType;
+import com.google.common.collect.Sets;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
@@ -11,16 +13,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StreetNamesProvider {
     private static final Logger log = LoggerFactory.getLogger(StreetNamesProvider.class);
 
 
-    public int findCitySymbolInSincDB(int voivodeshipNumber, int countyNumber, int communeNumber, String city) {
+    public Set<Integer> findCitySymbolInSincDB(int voivodeshipNumber, int countyNumber, String city) {
         InputStream adressResource = StreetNamesProvider.class.getResourceAsStream("/SIMC_Adresowy_2018-07-18.csv");
         try (Reader reader = new InputStreamReader(new BOMInputStream(adressResource), StandardCharsets.UTF_8)) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader()
@@ -28,16 +31,19 @@ public class StreetNamesProvider {
                     .withTrim()
                     .withDelimiter(';')
                     .parse(reader);
+            Set<Integer> citysymbols = new HashSet<>();
             for (CSVRecord record : records) {
                 int voivodeship = Integer.parseInt(record.get("WOJ"));
                 int county = Integer.parseInt(record.get("POW"));
-                int commune = Integer.parseInt(record.get("GMI"));
                 int citySymbol = Integer.parseInt(record.get("SYM"));
                 String cityRecord = record.get("NAZWA");
-                if (voivodeship == voivodeshipNumber && county == countyNumber && commune == communeNumber && cityRecord.equals(city)) {
-                    return citySymbol;
+                if (voivodeship == voivodeshipNumber && county == countyNumber && cityRecord.startsWith(city)) {
+                    log.debug("Found city {} for phrase {}", cityRecord, city);
+                    citysymbols.add(citySymbol);
                 }
+
             }
+            return citysymbols;
 
         } catch (IOException e) {
             log.error("Failed to read file", e);
@@ -45,31 +51,57 @@ public class StreetNamesProvider {
         throw new IllegalArgumentException("Did not find any city for given args.");
     }
 
-    public Set<String> findStreets(int citySymbol) {
+    public Map<StreetType, Set<String>> findStreets(int citySymbol) {
+        Map<StreetType, Set<String>> streetTypeToName = new HashMap<>();
         InputStream addressResource = StreetNamesProvider.class.getResourceAsStream("/ULIC_Adresowy_2018-07-18.csv");
-        Set<String> streets = new HashSet<>();
         try (Reader reader = new InputStreamReader(addressResource, StandardCharsets.UTF_8)) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader()
                     .withQuote(null)
                     .withTrim()
                     .withDelimiter(';')
                     .parse(reader);
+
             for (CSVRecord record : records) {
-                String street = (record.get("NAZWA_1"));
                 int citySym = Integer.parseInt(record.get("SYM"));
-                if(!record.get("NAZWA_2").isEmpty()){
-                    street = record.get("NAZWA_2") + " " + street;
+                if (citySym == citySymbol) {
+                    String streetTypeString = record.get("CECHA");
+                    String streetFirstPart = (record.get("NAZWA_1"));
+                    String secondStreetNamePart = record.get("NAZWA_2");
+                    StringBuilder streetNameBuilder = new StringBuilder();
+                    if (!secondStreetNamePart.isEmpty()) {
+                        streetNameBuilder.append(secondStreetNamePart).append(" ");
+                    }
+                    streetNameBuilder.append(streetFirstPart);
+                    StreetType streetType = StreetType.findStreetType(streetTypeString);
+                    if (!streetTypeToName.containsKey(streetType)) {
+                        Set<String> streets = new HashSet<>();
+                        streetTypeToName.put(streetType, streets);
+                    }
+                    streetTypeToName.get(streetType).add(streetNameBuilder.toString().toLowerCase());
                 }
 
-                if (citySym == citySymbol) {
-                    streets.add(street.toLowerCase());
-                }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("ERRROR", e);
         }
-        return streets;
+
+        for (Map.Entry<StreetType, Set<String>> entry : streetTypeToName.entrySet()) {
+            log.debug("Found {} streets for street type {}", entry.getValue().size(), entry.getKey());
+
+        }
+        return streetTypeToName;
 
     }
+
+    public Map<StreetType, Set<String>> findStreets(Set<Integer> citySymbols) {
+        return citySymbols.stream()
+                .map(symbol -> findStreets(symbol))
+                .flatMap(streets -> streets.entrySet().stream())
+                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue(), (v1, v2) -> Sets.union(v1, v2)));
+
+
+    }
+
+
 }
 

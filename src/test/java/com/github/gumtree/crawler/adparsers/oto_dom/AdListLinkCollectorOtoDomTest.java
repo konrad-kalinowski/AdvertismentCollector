@@ -2,7 +2,6 @@ package com.github.gumtree.crawler.adparsers.oto_dom;
 
 import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
-import com.github.gumtree.crawler.adparsers.olx.AdListLinkCollectorOlx;
 import org.assertj.core.api.Assertions;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -32,8 +30,8 @@ class AdListLinkCollectorOtoDomTest {
         List<String> advertsLinks = adListLinkCollectorOtoDom.getAdvertsLinks(file, 1, 1);
 
         Assertions.assertThat(advertsLinks).isNotEmpty();
+        Assertions.assertThat(advertsLinks.size()).isEqualTo(31);
         Assertions.assertThat(advertsLinks).contains("https://www.otodom.pl/oferta/atrakcyjne-mieszkania-na-krakowskim-" +
                 "biezanowie-ID3HuAo.html#c0ec293530");
-        Assertions.assertThat(advertsLinks.size()).isEqualTo(35);
     }
 }

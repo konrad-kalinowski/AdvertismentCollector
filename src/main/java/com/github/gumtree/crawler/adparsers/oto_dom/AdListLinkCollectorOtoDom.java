@@ -35,7 +35,7 @@ public class AdListLinkCollectorOtoDom extends AdLinksCollector {
     protected List<String> getLinks(Document document, int depthLimit, int inactivePeriodOfSeconds) {
         List<String> allCollectedLinks = new ArrayList<>();
         for (int i = 0; i < depthLimit; i++) {
-            Elements linkElements = document.select("div[class=offer-item-details] h3");
+            Elements linkElements = document.select("div[class=offer-item-details] h3 a");
             List<String> advertLinks = linkElements.stream()
                     .map(path -> path.attr("href"))
                     .collect(Collectors.toList());

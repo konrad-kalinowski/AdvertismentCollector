@@ -28,6 +28,6 @@ public class InflectionsFinder {
         } catch (IOException | URISyntaxException e) {
             log.error("Failed to open file", e);
         }
-        return Collections.emptyList();
+        return Collections.singletonList(phrase);
     }
 }
