@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum StreetType {
-    STREET("ulica", "ul.", "ul", "ulica", "ulicy"),
-    AVENUE("aleje", "aleja", "al.", "al", "alejach", "aleji", "alei"),
-    RESIDENTIAL("osiedle", "os.", "os", "osiedlu"),
+    STREET("ulica", "ul.", "ul", "ulica", "ulicy", "ulice"),
+    AVENUE("aleje", "aleja", "al.", "al", "alejach", "aleji", "alei", "aleję"),
+    RESIDENTIAL("osiedle", "os.", "os", "osiedlu", "osiedlę"),
     PARK("park", "parku"),
     SQUARE("plac", "placu", "pl.", "pl"),
     ROUNDABOUT("rondo", "rondzie", "ronda"),
@@ -26,6 +26,10 @@ public enum StreetType {
         synonimList.addAll(Arrays.asList(synonyms));
         synonimList.add(name);
         this.synonyms = Sets.newHashSet(synonimList);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static StreetType findStreetType(String typeName) {
