@@ -3,6 +3,7 @@ package com.github.gumtree.crawler.adparsers;
 
 import com.github.gumtree.crawler.model.StreetType;
 import com.github.gumtree.crawler.util.InflectionsFinder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LocationFinder {
     private static final Logger log = LoggerFactory.getLogger(LocationFinder.class);
@@ -35,9 +37,11 @@ public class LocationFinder {
         Set<String> locationFound = new HashSet<>();
         List<String> sentences = Arrays.asList(description.split(SENTENCE_SPLIT_REGEX));
         for (String sentence : sentences) {
-            List<String> words = Arrays.asList(sentence
+            List<String> words = Arrays.stream(sentence
                     .replaceAll("[.,()/]", "")
-                    .split(" "));
+                    .split(" "))
+                    .filter(word -> StringUtils.isNotBlank(word))
+                    .collect(Collectors.toList());
             for (int i = 0; i < words.size(); i++) {
                 if (STREET_PREFIXES.contains(words.get(i).toLowerCase())) {
                     String streetName = getStreetName(words.subList(i, words.size()));

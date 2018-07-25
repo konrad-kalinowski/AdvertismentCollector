@@ -23,6 +23,9 @@ class StreetNamesProviderTest {
         Assertions.assertThat(streets.get(StreetType.STREET)).contains("ludwika zieleniewskiego");
         Assertions.assertThat(streets.get(StreetType.PARK)).contains("krowoderski");
         Assertions.assertThat(streets.get(StreetType.RESIDENTIAL)).contains("krowodrza górka");
+        Assertions.assertThat(streets.get(StreetType.STREET)).contains("galla");
+        Assertions.assertThat(streets.get(StreetType.STREET)).contains("kronikarza galla");
+
 
 
     }

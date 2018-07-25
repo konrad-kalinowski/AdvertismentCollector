@@ -87,6 +87,9 @@ public class StreetNamesProvider {
                         Set<String> streets = new HashSet<>();
                         streetTypeToName.put(streetType, streets);
                     }
+                    if(!secondStreetNamePart.isEmpty()){
+                        streetTypeToName.get(streetType).add(streetFirstPart.toLowerCase());
+                    }
                     streetTypeToName.get(streetType).add(fullStreetName);
                 }
 
