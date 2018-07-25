@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,8 +45,13 @@ public class LocationFinder {
                     .collect(Collectors.toList());
             for (int i = 0; i < words.size(); i++) {
                 if (STREET_PREFIXES.contains(words.get(i).toLowerCase())) {
-                    String streetName = getStreetName(words.subList(i, words.size()));
+                    List<String> streetContainingPart = words.subList(i, words.size());
+                    String streetName = getStreetName(streetContainingPart);
+                    Optional<Integer> buldingNumber = findBuldingNumber(streetContainingPart, streetName);
                     if (!streetName.isEmpty()) {
+                        if (buldingNumber.isPresent()) {
+                            streetName = streetName + " " + buldingNumber.get();
+                        }
                         locationFound.add(streetName);
                     }
                 }
@@ -82,6 +88,18 @@ public class LocationFinder {
         log.debug("Checking if 1-part street name exists {}", location);
         List<String> inflections = inflectionsFinder.findInflections(location);
         return findStreet(streetType, inflections);
+    }
+
+    private Optional<Integer> findBuldingNumber(List<String> streetContainingPart, String streetName) {
+        int streetNameLength = streetName.split(" ").length;
+        if (streetContainingPart.size() > streetNameLength+1) {
+            String maybeBuildingNumber = streetContainingPart.get(streetNameLength+1);
+            if (StringUtils.isNumeric(maybeBuildingNumber)) {
+                return Optional.of(Integer.parseInt(maybeBuildingNumber));
+            }
+        }
+        return Optional.empty();
+
     }
 
 }
