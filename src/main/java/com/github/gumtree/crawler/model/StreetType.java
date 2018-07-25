@@ -2,20 +2,30 @@ package com.github.gumtree.crawler.model;
 
 import com.google.common.collect.Sets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum StreetType {
-    STREET("ul.", "ul", "ulica", "ulicy"),
-    AVENUE("al.", "al", "aleje", "alejach", "aleji", "alei"),
-    RESIDENTIAL("os.", "os", "osiedle", "osiedlu"),
+    STREET("ulica", "ul.", "ul", "ulica", "ulicy"),
+    AVENUE("aleje", "aleja", "al.", "al", "alejach", "aleji", "alei"),
+    RESIDENTIAL("osiedle", "os.", "os", "osiedlu"),
+    PARK("park", "parku"),
+    SQUARE("plac", "placu", "pl.", "pl"),
+    ROUNDABOUT("rondo", "rondzie", "ronda"),
     OTHER("");
 
+    private String name;
     private Set<String> synonyms;
 
-    StreetType(String... synonyms) {
-        this.synonyms = Sets.newHashSet(synonyms);
+    StreetType(String name, String... synonyms) {
+        this.name = name;
+        List<String> synonimList = new ArrayList<>();
+        synonimList.addAll(Arrays.asList(synonyms));
+        synonimList.add(name);
+        this.synonyms = Sets.newHashSet(synonimList);
     }
 
     public static StreetType findStreetType(String typeName) {

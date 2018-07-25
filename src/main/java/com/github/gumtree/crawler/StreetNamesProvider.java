@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +14,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,17 +70,24 @@ public class StreetNamesProvider {
                     String streetTypeString = record.get("CECHA");
                     String streetFirstPart = (record.get("NAZWA_1"));
                     String secondStreetNamePart = record.get("NAZWA_2");
-                    StringBuilder streetNameBuilder = new StringBuilder();
-                    if (!secondStreetNamePart.isEmpty()) {
-                        streetNameBuilder.append(secondStreetNamePart).append(" ");
+                    String fullStreetName = buildFullStreetName(streetFirstPart, secondStreetNamePart);
+
+                    StreetType streetType;
+                    if (StringUtils.isBlank(streetTypeString)) {
+                        List<String> words = Arrays.asList(fullStreetName.split(" "));
+                        streetType = StreetType.findStreetType(words.get(0));
+                        if (streetType != StreetType.OTHER) {
+                            fullStreetName = String.join(" ", words.subList(1, words.size()));
+                        }
+                    } else {
+                        streetType = StreetType.findStreetType(streetTypeString);
                     }
-                    streetNameBuilder.append(streetFirstPart);
-                    StreetType streetType = StreetType.findStreetType(streetTypeString);
+
                     if (!streetTypeToName.containsKey(streetType)) {
                         Set<String> streets = new HashSet<>();
                         streetTypeToName.put(streetType, streets);
                     }
-                    streetTypeToName.get(streetType).add(streetNameBuilder.toString().toLowerCase());
+                    streetTypeToName.get(streetType).add(fullStreetName);
                 }
 
             }
@@ -91,6 +101,15 @@ public class StreetNamesProvider {
         }
         return streetTypeToName;
 
+    }
+
+    private String buildFullStreetName(String streetFirstPart, String secondStreetNamePart) {
+        StringBuilder streetNameBuilder = new StringBuilder();
+        if (!secondStreetNamePart.isEmpty()) {
+            streetNameBuilder.append(secondStreetNamePart).append(" ");
+        }
+        streetNameBuilder.append(streetFirstPart);
+        return streetNameBuilder.toString().toLowerCase();
     }
 
     public Map<StreetType, Set<String>> findStreets(Set<Integer> citySymbols) {

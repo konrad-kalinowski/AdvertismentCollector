@@ -17,9 +17,14 @@ class StreetNamesProviderTest {
 
         Map<StreetType, Set<String>> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
         Assertions.assertThat(streets).isNotEmpty();
-        Assertions.assertThat(streets.size()).isEqualTo(3);
+        Assertions.assertThat(streets.size()).isEqualTo(7);
         Assertions.assertThat(streets.get(StreetType.STREET)).contains("czyżyńska");
         Assertions.assertThat(streets.get(StreetType.STREET)).contains("ludwika zieleniewskiego");
+        Assertions.assertThat(streets.get(StreetType.STREET)).contains("ludwika zieleniewskiego");
+        Assertions.assertThat(streets.get(StreetType.PARK)).contains("krowoderski");
+        Assertions.assertThat(streets.get(StreetType.RESIDENTIAL)).contains("krowodrza górka");
+
+
     }
 
 

@@ -12,12 +12,14 @@ import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
 
 class LocationFinderTest {
-
+    private static final Logger log = LoggerFactory.getLogger(LocationFinderTest.class);
 
     private static Map<StreetType, Set<String>> AVAILABLE_STREETS;
 
@@ -27,6 +29,8 @@ class LocationFinderTest {
         Set<Integer> citySymbolInSincDB = streetNamesProvider.findCitySymbolInSincDB(12, 61, "Kraków");
         AVAILABLE_STREETS = streetNamesProvider.findStreets(citySymbolInSincDB);
 
+        log.debug("Initialized test with {} streets", AVAILABLE_STREETS.size());
+        log.debug("Streets: {}", AVAILABLE_STREETS);
     }
 
     @ParameterizedTest
@@ -37,10 +41,6 @@ class LocationFinderTest {
         Set<String> foundLocationInDesc = locationFinder.findLocationInDesc(description);
         Assertions.assertThat(foundLocationInDesc).isNotEmpty();
         Assertions.assertThat(foundLocationInDesc).containsAll(expectedStreets);
-        for (String s : foundLocationInDesc) {
-            System.out.println(s);
-        }
-
     }
 
     private static final class ToSetConverter extends SimpleArgumentConverter {
