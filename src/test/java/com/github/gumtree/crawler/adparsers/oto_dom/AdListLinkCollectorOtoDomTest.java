@@ -24,10 +24,10 @@ class AdListLinkCollectorOtoDomTest {
         JsoupProvider jsoupeSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupeSpy).connect(any());
 
-        AdListLinkCollectorOtoDom adListLinkCollectorOtoDom = new AdListLinkCollectorOtoDom(jsoupeSpy, new DuplicatedLinkChecker(Collections.emptyList()));
+        AdListLinkCollectorOtoDom adListLinkCollectorOtoDom = new AdListLinkCollectorOtoDom(jsoupeSpy, new DuplicatedLinkChecker(Collections.emptyList()), 1);
         URL resource = AdInfoCollectorOtoDomTest.class.getResource("/list_of_adverts_otodom.html");
         File file = new File(resource.toURI());
-        List<String> advertsLinks = adListLinkCollectorOtoDom.getAdvertsLinks(file, 1, 1);
+        List<String> advertsLinks = adListLinkCollectorOtoDom.getAdvertsLinks(file, 1);
 
         Assertions.assertThat(advertsLinks).isNotEmpty();
         Assertions.assertThat(advertsLinks.size()).isEqualTo(31);

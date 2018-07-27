@@ -25,10 +25,11 @@ class AdListLinkCollectorOlxTest {
         JsoupProvider jsoupeSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupeSpy).connect(any());
 
-        AdListLinkCollectorOlx adListLinkCollectorOlx = new AdListLinkCollectorOlx(jsoupeSpy, new DuplicatedLinkChecker(Collections.emptyList()));
+        AdListLinkCollectorOlx adListLinkCollectorOlx = new AdListLinkCollectorOlx(jsoupeSpy,
+                new DuplicatedLinkChecker(Collections.emptyList()),1);
         URL resource = AdListLinkCollectorOlxTest.class.getResource("/list_of_ads_olx.html");
         File file = new File(resource.toURI());
-        List<String> advertsLinks = adListLinkCollectorOlx.getAdvertsLinks(file, 1, 1);
+        List<String> advertsLinks = adListLinkCollectorOlx.getAdvertsLinks(file, 1);
 
         Assertions.assertThat(advertsLinks).contains("https://www.olx.pl/oferta/mieszkanie-przy-umk-na-ul-falata" +
                 "-bez-posrednika-po-remoncie-CID3-IDwJGeZ.html#f3c4691bd2;promoted");

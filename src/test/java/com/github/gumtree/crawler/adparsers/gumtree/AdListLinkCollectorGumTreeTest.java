@@ -26,10 +26,11 @@ class AdListLinkCollectorGumTreeTest {
         JsoupProvider jsoupProviderSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupProviderSpy).connect(any());
 
-        AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProviderSpy, new DuplicatedLinkChecker(Collections.emptyList()));
+        AdListLinkCollectorGumTree adListLinkCollectorGumTree = new AdListLinkCollectorGumTree(jsoupProviderSpy,
+                new DuplicatedLinkChecker(Collections.emptyList()),1);
         URL sectionsIo = AdListLinkCollectorGumTreeTest.class.getResource("/sections.html");
         File htmlFile = new File(sectionsIo.toURI());
-        List<String> advertsLinks = adListLinkCollectorGumTree.getAdvertsLinks(htmlFile, 1, 0);
+        List<String> advertsLinks = adListLinkCollectorGumTree.getAdvertsLinks(htmlFile, 1);
 
         assertThat(advertsLinks).hasSize(23);
         assertThat(advertsLinks.get(0)).startsWith(GUMTREE_DOMAIN);

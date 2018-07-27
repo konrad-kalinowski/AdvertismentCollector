@@ -5,18 +5,21 @@ import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
+@Service
 public class AdInfoCollectorGumTree implements AdInfoCollector {
     private final JsoupProvider jsoupProvider;
 
+    @Autowired
     public AdInfoCollectorGumTree(JsoupProvider jsoupProvider) {
         this.jsoupProvider = jsoupProvider;
     }
@@ -25,6 +28,7 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
     public boolean canProcess(String advertLink) {
         return advertLink.startsWith(Domain.GUMTREE_DOMAIN);
     }
+
 
     public Advertisement collectInfo(File file){
         Document document = jsoupProvider.parseFile(file);
@@ -44,11 +48,13 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
         Elements descriptionElement = document.select("div[class=description] span[class=pre]");
         String description = descriptionElement.text();
         String location = document.select("div[class=attribute] span:contains(Lokalizacja) ~ span").text();
+        double pricePerSquareMeter = price/area;
         return new Advertisement.AdvertBuilder(title, document.location())
                 .area(area)
                 .description(description)
                 .location(location)
                 .price(price)
+                .pricePerSquareMeter(pricePerSquareMeter)
                 .build();
     }
 

@@ -5,27 +5,38 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Service
 public class BatchAdInfoCollector {
 
     private static final Logger log = LoggerFactory.getLogger(BatchAdInfoCollector.class);
-    private final List<AdInfoCollector> adInfoCollector;
+    private final List<AdInfoCollector> adInfoCollectors;
     private final JsoupProvider jsoupProvider;
     private final List<OnBatchReadyListener> batchReadyListeners;
     private final int batchSize;
+    private int inactivePeriodSeconds;
 
-    public BatchAdInfoCollector(List<AdInfoCollector> adInfoCollectors, JsoupProvider jsoupProvider, List<OnBatchReadyListener> batchReadyListeners, int batchSize) {
-        this.adInfoCollector = adInfoCollectors;
+    @Autowired
+    public BatchAdInfoCollector(List<AdInfoCollector> adInfoCollectors,
+                                JsoupProvider jsoupProvider,
+                                List<OnBatchReadyListener> batchReadyListeners,
+                                @Value("${adverts.collector.batch.size:1}") int batchSize,
+                                @Value("${ad.links.collector.inactive.period.seconds:5}") int inactivePeriodSeconds) {
+        this.adInfoCollectors = adInfoCollectors;
         this.jsoupProvider = jsoupProvider;
         this.batchReadyListeners = batchReadyListeners;
         this.batchSize = batchSize;
+        this.inactivePeriodSeconds = inactivePeriodSeconds;
     }
 
-    public void collectAdvertsDetails(List<String> advertLinks, int inactivePeriodOfSeconds) {
+    public void collectAdvertsDetails(List<String> advertLinks) {
         List<List<String>> partitions = Lists.partition(advertLinks, batchSize);
 
         for (List<String> partition : partitions) {
@@ -33,13 +44,13 @@ public class BatchAdInfoCollector {
             for (String advertLink : partition) {
                 try {
                     log.debug("Fetching adverisment info {}", advertLink);
-                    AdInfoCollector adInfoCollector = this.adInfoCollector.stream()
+                    AdInfoCollector adInfoCollector = this.adInfoCollectors.stream()
                             .filter(collector -> collector.canProcess(advertLink))
                             .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("Failed to find suitable advert collector for link " + advertLink));
                     Advertisement advertisement = adInfoCollector.collectAdInfo(jsoupProvider.connect(advertLink));
                     advertBatch.add(advertisement);
-                    Uninterruptibles.sleepUninterruptibly(inactivePeriodOfSeconds, TimeUnit.SECONDS);
+                    Uninterruptibles.sleepUninterruptibly(inactivePeriodSeconds, TimeUnit.SECONDS);
                 } catch (Exception e) {
                     log.warn("Failed to fetch advert " + advertLink, e);
                 }

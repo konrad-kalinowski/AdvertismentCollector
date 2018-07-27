@@ -5,23 +5,28 @@ import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
+@Service
 public class AdInfoCollectorOtoDom implements AdInfoCollector {
 
-    private static JsoupProvider jsoupeProvider;
+    private static JsoupProvider jsoupProvider;
 
-    public AdInfoCollectorOtoDom(JsoupProvider jsoupeSpy) {
-        this.jsoupeProvider = jsoupeSpy;
+    @Autowired
+    public AdInfoCollectorOtoDom(JsoupProvider jsoupProvider) {
+        this.jsoupProvider = jsoupProvider;
     }
 
 
     public Advertisement collectInfo(File file) {
-        Document document = jsoupeProvider.parseFile(file);
+        Document document = jsoupProvider.parseFile(file);
         return collectAdInfo(document);
     }
 
@@ -41,11 +46,13 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
         double area = StringUtils.isNumeric(areaText) ? Double.parseDouble(areaText) : Double.MIN_VALUE;
         String description = document.select("div[itemprop=description]").text();
         String location = document.select("p[class=address-text]").first().text();
+        double priceForSquare = area/price;
         return Advertisement.builder(title, document.location())
                 .area(area)
                 .location(location)
                 .description(description)
                 .price(price)
+                .pricePerSquareMeter(priceForSquare)
                 .build();
     }
 }

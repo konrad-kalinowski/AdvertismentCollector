@@ -9,18 +9,25 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 public class AdListLinkCollectorGumTree extends AdLinksCollector {
 
     private static final Logger log = LoggerFactory.getLogger(AdListLinkCollectorGumTree.class);
 
-    public AdListLinkCollectorGumTree(JsoupProvider jsoupProvider, DuplicatedLinkChecker duplicatedLinkChecker) {
-        super(jsoupProvider, duplicatedLinkChecker);
+    @Autowired
+    public AdListLinkCollectorGumTree(JsoupProvider jsoupProvider,
+                                      DuplicatedLinkChecker duplicatedLinkChecker,
+                                      @Value("${ad.links.collector.inactive.period.seconds:5}") int inactivePeriodSeconds) {
+        super(jsoupProvider, duplicatedLinkChecker, inactivePeriodSeconds);
     }
 
 
@@ -30,7 +37,7 @@ public class AdListLinkCollectorGumTree extends AdLinksCollector {
     }
 
     @Override
-    protected List<String> getLinks(Document doc, int depthLimit, int inactivePeriodOfSeconds) {
+    protected List<String> getLinks(Document doc, int depthLimit) {
         List<String> allCollectedLinks = new ArrayList<>();
         for (int i = 0; i < depthLimit; i++) {
             Elements linkElements = doc.select("div[class=title] a[href]");
@@ -44,11 +51,7 @@ public class AdListLinkCollectorGumTree extends AdLinksCollector {
             Element nextPageLinkElement = doc.select("div[class=pagination]  a[class=next follows]").first();
             String nextPageLink = nextPageLinkElement.attr("href");
             nextPageLink = Domain.getFullLink(nextPageLink);
-            try {
-                Thread.sleep(inactivePeriodOfSeconds * 1000);
-            } catch (InterruptedException e) {
-                log.error("Interrupted");
-            }
+            sleepForInactivityPeriod();
             log.debug("Fetching next page {}", nextPageLink);
             doc = jsoupProvider.connect(nextPageLink);
 

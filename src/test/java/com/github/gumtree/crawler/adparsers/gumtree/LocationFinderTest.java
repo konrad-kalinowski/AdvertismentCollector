@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,16 +38,19 @@ class LocationFinderTest {
     @CsvFileSource(resources = {"/locationFinderTest.csv"})
     void findLocationInDesc(String description, @ConvertWith(ToSetConverter.class) Set<String> expectedStreets) {
 
-        LocationFinder locationFinder = new LocationFinder(AVAILABLE_STREETS, new InflectionsFinder());
-        Set<String> foundLocationInDesc = locationFinder.findLocationInDesc(description);
-        Assertions.assertThat(foundLocationInDesc).isNotEmpty();
+        LocationFinder locationFinder = new LocationFinder(new InflectionsFinder());
+        Set<String> foundLocationInDesc = locationFinder.findLocationInDesc(AVAILABLE_STREETS, description);
         Assertions.assertThat(foundLocationInDesc).containsAll(expectedStreets);
     }
 
     private static final class ToSetConverter extends SimpleArgumentConverter {
         @Override
         protected Object convert(Object o, Class<?> aClass) throws ArgumentConversionException {
-            String[] words = ((String) o).split(",");
+            String data = ((String) o);
+            if (data.isEmpty()) {
+                return Collections.emptySet();
+            }
+            String[] words = data.split(",");
             return Sets.newHashSet(words);
         }
     }

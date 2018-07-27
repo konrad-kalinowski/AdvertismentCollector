@@ -6,7 +6,11 @@ import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.h2.tools.Server;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +25,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Repository
 public class AdCollectorDao {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AdCollectorDao.class);
     private static final String DUMP_FILE = "dump.sql";
@@ -31,7 +35,7 @@ public class AdCollectorDao {
     private String url;
     private Connection con;
 
-
+    @PostConstruct
     public void initialize() {
         initialize("/skrypt.sql");
     }
@@ -69,6 +73,7 @@ public class AdCollectorDao {
         }
     }
 
+    @PreDestroy
     public void close() {
         try {
             if (con != null) {
@@ -96,7 +101,7 @@ public class AdCollectorDao {
             statement.setString(4, advertisement.getDescription());
             statement.setString(5, advertisement.getLocation());
             statement.setDouble(6, advertisement.getArea());
-            statement.setString(7, advertisement.getAddresses().stream().collect(Collectors.joining()));
+            statement.setString(7, advertisement.getAddresses().stream().collect(Collectors.joining(",")));
             statement.executeUpdate();
 
         } catch (SQLException e) {

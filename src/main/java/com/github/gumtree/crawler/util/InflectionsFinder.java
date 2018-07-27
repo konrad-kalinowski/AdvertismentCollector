@@ -2,6 +2,7 @@ package com.github.gumtree.crawler.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Service
 public class InflectionsFinder {
     private static final Logger log = LoggerFactory.getLogger(InflectionsFinder.class);
 
@@ -24,7 +26,7 @@ public class InflectionsFinder {
             return stream
                     .map(line -> Arrays.asList(line.toLowerCase().split(", ")))
                     .filter(line -> line.contains(searchPhrase))
-                    .findFirst().orElseThrow(() -> new IllegalArgumentException("No inflections found for phrase " + searchPhrase));
+                    .findFirst().orElse(Collections.singletonList(phrase));
         } catch (IOException | URISyntaxException e) {
             log.error("Failed to open file", e);
         }

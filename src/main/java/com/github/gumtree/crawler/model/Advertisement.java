@@ -11,9 +11,10 @@ public class Advertisement {
     private final String location;
     private final double area;
     private Set<String> addresses;
+    private double priceForSquare;
 
 
-    private Advertisement(String title, String link, double price, String description, String location, double area, Set<String> addresses) {
+    private Advertisement(String title, String link, double price, String description, String location, double area, Set<String> addresses, double priceForSquare) {
         this.title = title;
         this.link = link;
         this.price = price;
@@ -21,8 +22,10 @@ public class Advertisement {
         this.location = location;
         this.area = area;
         this.addresses = addresses == null ? Collections.EMPTY_SET : this.addresses;
+        this.priceForSquare = priceForSquare;
     }
-    public static AdvertBuilder builder(String title, String link){
+
+    public static AdvertBuilder builder(String title, String link) {
         return new AdvertBuilder(title, link);
     }
 
@@ -50,6 +53,10 @@ public class Advertisement {
         return area;
     }
 
+    public double getPricePerSquareMeter() {
+        return priceForSquare;
+    }
+
     public void setpossibleaddresses(Set<String> locationInDesc) {
         this.addresses = locationInDesc;
     }
@@ -61,6 +68,7 @@ public class Advertisement {
     public static class AdvertBuilder {
         private final String title;
         private final String link;
+        private double priceForSquare;
         private double price;
         private String description;
         private String location;
@@ -93,13 +101,18 @@ public class Advertisement {
 
         }
 
+        public AdvertBuilder pricePerSquareMeter(double priceForSquare) {
+            this.priceForSquare = priceForSquare;
+            return this;
+        }
+
         public AdvertBuilder addresses(Set<String> addresses) {
             this.addresses = addresses;
             return this;
         }
 
         public Advertisement build() {
-            return new Advertisement(title, link, price, description, location, area, addresses);
+            return new Advertisement(title, link, price, description, location, area, addresses, priceForSquare);
         }
 
     }

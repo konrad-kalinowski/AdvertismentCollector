@@ -28,10 +28,14 @@ class AdInfoCollectorGumTreeTest {
         File htmlFile = new File(sectionsIo.toURI());
         Advertisement advertisement = adInfoCollectorGumTree.collectInfo(htmlFile);
 
+
         Assertions.assertThat(advertisement).isNotNull();
         Assertions.assertThat(advertisement.getLink()).endsWith("single-test-advert.html");
-        Assertions.assertThat(advertisement.getPrice()).isEqualTo(790_000d);
-        Assertions.assertThat(advertisement.getArea()).isEqualTo(136);
+        double expectedPrice = 790_000d;
+        Assertions.assertThat(advertisement.getPrice()).isEqualTo(expectedPrice);
+        double expectedArea = 136;
+        Assertions.assertThat(advertisement.getArea()).isEqualTo(expectedArea);
+        Assertions.assertThat(advertisement.getPricePerSquareMeter()).isEqualTo(expectedPrice/expectedArea);
         Assertions.assertThat(advertisement.getDescription())
                 .isNotBlank()
                 .startsWith("Okazja! W ofercie apartament cztero pokojowy w ścisłym centrum Krakowa.")

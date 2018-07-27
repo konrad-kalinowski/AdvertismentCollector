@@ -6,6 +6,8 @@ import com.github.gumtree.crawler.util.InflectionsFinder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 public class LocationFinder {
     private static final Logger log = LoggerFactory.getLogger(LocationFinder.class);
     private static final Logger locations = LoggerFactory.getLogger("locations");
@@ -26,33 +29,38 @@ public class LocationFinder {
             "(?<=\\.|\\?)\\s";
     private static final Set<String> STREET_PREFIXES = StreetType.allStreetNamePrefixes();
 
-    private final Map<StreetType, Set<String>> availableStreets;
     private final InflectionsFinder inflectionsFinder;
 
-    public LocationFinder(Map<StreetType, Set<String>> streetTypesToNames, InflectionsFinder inflectionsFinder) {
-        this.availableStreets = streetTypesToNames;
+    @Autowired
+    public LocationFinder(InflectionsFinder inflectionsFinder) {
         this.inflectionsFinder = inflectionsFinder;
     }
 
-    public Set<String> findLocationInDesc(String description) {
+    public Set<String> findLocationInDesc(Map<StreetType, Set<String>> availableStreets, String description) {
         Set<String> locationFound = new HashSet<>();
         List<String> sentences = Arrays.asList(description.split(SENTENCE_SPLIT_REGEX));
         for (String sentence : sentences) {
             List<String> words = Arrays.stream(sentence
-                    .replaceAll("[.,()/]", "")
-                    .split(" "))
+                    .replaceAll("[.,()]", "")
+                    .split("[ /]"))
                     .filter(word -> StringUtils.isNotBlank(word))
                     .collect(Collectors.toList());
+
             for (int i = 0; i < words.size(); i++) {
                 if (STREET_PREFIXES.contains(words.get(i).toLowerCase())) {
                     List<String> streetContainingPart = words.subList(i, words.size());
-                    String streetName = getStreetName(streetContainingPart);
-                    Optional<Integer> buldingNumber = findBuldingNumber(streetContainingPart, streetName);
-                    if (!streetName.isEmpty()) {
-                        if (buldingNumber.isPresent()) {
-                            streetName = streetName + " " + buldingNumber.get();
+                    if (streetContainingPart.size() > 1) {
+                        String streetName = getStreetName(availableStreets, streetContainingPart);
+                        Optional<Integer> buldingNumber = findBuldingNumber(streetContainingPart, streetName);
+                        if (!streetName.isEmpty()) {
+                            if (buldingNumber.isPresent()) {
+                                streetName = streetName + " " + buldingNumber.get();
+                            }
+                            locationFound.add(streetName);
+                            locations.info("{}, {}", streetName, sentence);
+                        } else {
+                            locations.warn("{}", sentence);
                         }
-                        locationFound.add(streetName);
                     }
                 }
             }
@@ -61,7 +69,7 @@ public class LocationFinder {
         return locationFound;
     }
 
-    private String findStreet(StreetType streetType, List<String> inflections) {
+    private String findStreet(Map<StreetType, Set<String>> availableStreets, StreetType streetType, List<String> inflections) {
         for (String inflection : inflections) {
             if (availableStreets.get(streetType).contains(inflection)) {
                 return inflection;
@@ -71,7 +79,7 @@ public class LocationFinder {
         return "";
     }
 
-    private String getStreetName(List<String> streetContainingPart) {
+    private String getStreetName(Map<StreetType, Set<String>> availableStreets, List<String> streetContainingPart) {
         StreetType streetType = StreetType.findStreetType(streetContainingPart.get(0));
         for (int i = MAX_STREET_NAME_LENGTH; i >= 1; i--) {
             List<String> possibleStreetName = streetContainingPart.subList(1,
@@ -87,13 +95,13 @@ public class LocationFinder {
         String location = streetContainingPart.get(1);
         log.debug("Checking if 1-part street name exists {}", location);
         List<String> inflections = inflectionsFinder.findInflections(location);
-        return findStreet(streetType, inflections);
+        return findStreet(availableStreets, streetType, inflections);
     }
 
     private Optional<Integer> findBuldingNumber(List<String> streetContainingPart, String streetName) {
         int streetNameLength = streetName.split(" ").length;
-        if (streetContainingPart.size() > streetNameLength+1) {
-            String maybeBuildingNumber = streetContainingPart.get(streetNameLength+1);
+        if (streetContainingPart.size() > streetNameLength + 1) {
+            String maybeBuildingNumber = streetContainingPart.get(streetNameLength + 1);
             if (StringUtils.isNumeric(maybeBuildingNumber)) {
                 return Optional.of(Integer.parseInt(maybeBuildingNumber));
             }

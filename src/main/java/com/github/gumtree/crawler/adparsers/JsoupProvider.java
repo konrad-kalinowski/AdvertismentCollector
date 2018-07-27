@@ -2,11 +2,13 @@ package com.github.gumtree.crawler.adparsers;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Service
 public class JsoupProvider {
 
     public Document connect(String url) {

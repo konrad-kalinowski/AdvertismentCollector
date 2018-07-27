@@ -6,14 +6,18 @@ import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
+@Service
 public class AdInfoCollectorOlx implements AdInfoCollector {
     private static JsoupProvider jsoupProvider;
 
+    @Autowired
     public AdInfoCollectorOlx(JsoupProvider jsoupProvider) {
         this.jsoupProvider=jsoupProvider;
     }
@@ -39,11 +43,13 @@ public class AdInfoCollectorOlx implements AdInfoCollector {
         double area = StringUtils.isBlank(areaText) ? Double.MIN_VALUE : Double.parseDouble(areaText);
         String descriptionText = document.select("#textContent").text();
         String location = document.select("div [class=offer-titlebox__details] > a").text();
+        double priceForSquare = area/price;
         return new Advertisement.AdvertBuilder(title, document.location())
                 .area(area)
                 .description(descriptionText)
                 .location(location)
                 .price(price)
+                .pricePerSquareMeter(priceForSquare)
                 .build();
     }
 
