@@ -1,5 +1,6 @@
 package com.github.gumtree.crawler.adparsers;
 
+import com.github.gumtree.crawler.model.AdLinks;
 import com.github.gumtree.crawler.model.Advertisement;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -36,8 +37,8 @@ public class BatchAdInfoCollector {
         this.inactivePeriodSeconds = inactivePeriodSeconds;
     }
 
-    public void collectAdvertsDetails(List<String> advertLinks) {
-        List<List<String>> partitions = Lists.partition(advertLinks, batchSize);
+    public void collectAdvertsDetails(AdLinks adLinks) {
+        List<List<String>> partitions = Lists.partition(adLinks.getLinks(), batchSize);
 
         for (List<String> partition : partitions) {
             List<Advertisement> advertBatch = new ArrayList<>();
@@ -48,7 +49,7 @@ public class BatchAdInfoCollector {
                             .filter(collector -> collector.canProcess(advertLink))
                             .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("Failed to find suitable advert collector for link " + advertLink));
-                    Advertisement advertisement = adInfoCollector.collectAdInfo(jsoupProvider.connect(advertLink));
+                    Advertisement advertisement = adInfoCollector.collectAdInfo(adLinks.getCountry(), adLinks.getCity(), jsoupProvider.connect(advertLink));
                     advertBatch.add(advertisement);
                     Uninterruptibles.sleepUninterruptibly(inactivePeriodSeconds, TimeUnit.SECONDS);
                 } catch (Exception e) {

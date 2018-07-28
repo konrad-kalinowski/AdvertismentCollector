@@ -31,7 +31,7 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
 
     public Advertisement collectInfo(File file) {
         Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo(document);
+        return collectAdInfo("", "", document);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
     }
 
     @Override
-    public Advertisement collectAdInfo(Document document) {
+    public Advertisement collectAdInfo(String country, String city, Document document) {
         String title = document.select("div[class=article-offer] header h1").text();
         document.outputSettings().escapeMode(xhtml);
         String priceText = document.select("strong[class=box-price-value] ").first().text();
@@ -49,10 +49,10 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
         String areaText = document.select("div[class=area-lane] span[class=big]").text().replace(" m²", "");
         double area = ValueParsers.parseValue(areaText);
         String description = document.select("div[itemprop=description]").text();
-        String location = document.select("p[class=address-text]").first().text();
         return Advertisement.builder(title, document.location())
                 .area(area)
-                .location(location)
+                .country(country)
+                .city(city)
                 .description(description)
                 .price(price)
                 .build();

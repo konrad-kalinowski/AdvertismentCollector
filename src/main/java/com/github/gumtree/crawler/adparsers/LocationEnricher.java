@@ -28,7 +28,7 @@ public class LocationEnricher implements OnBatchReadyListener {
     public void onBatchReady(List<Advertisement> batch) {
         for (Advertisement advertisement : batch) {
             Set<String> locationInDesc = locationFinder.findLocationInDesc(availableStreets,advertisement.getDescription());
-            advertisement.setpossibleaddresses(locationInDesc);
+            advertisement.setPossibleAddresses(locationInDesc);
         }
         advertsUploader.uploadAdverts(batch);
     }

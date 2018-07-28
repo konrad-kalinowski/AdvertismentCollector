@@ -6,9 +6,12 @@ import com.github.gumtree.crawler.db.AdCollectorDao;
 import com.github.gumtree.crawler.model.StreetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,5 +34,21 @@ public class AppConfiguration {
         Map<StreetType, Set<String>> streets = streetNamesProvider.findStreets(citySymbolInSincDB);
         log.debug("Initialized with {} streets {}", streets.size(), streets);
         return streets;
+    }
+
+    @Bean
+    public Connection connection(@Value("${database.hostname}") String dbHost,
+                                 @Value("${database.port}") int dbPort,
+                                 @Value("${database.name}") String dbName,
+                                 @Value("${database.user}") String user,
+                                 @Value("${database.password}") String password
+    ) {
+        String url = String.format("jdbc:mysql://%s:%s/%s", dbHost, dbPort, dbName);
+        try {
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            return DriverManager.getConnection(url, user, password);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect", e);
+        }
     }
 }

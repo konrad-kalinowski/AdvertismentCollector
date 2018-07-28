@@ -25,17 +25,19 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 String link = resultSet.getString("ADVERTS.LINK");
                 double price = resultSet.getDouble("ADVERTS.PRICE");
                 String description = resultSet.getString("ADVERTS.DESCRIPTION");
-                String location = resultSet.getString("ADVERTS.LOCATION");
+                String country = resultSet.getString("ADVERTS.COUNTRY");
+                String city = resultSet.getString("ADVERTS.CITY");
+                String streets = resultSet.getString("ADVERTS.ADDRESSES");
                 double area = resultSet.getDouble("ADVERTS.AREA");
-                String addresses = resultSet.getString("ADVERTS.ADDRESSES");
-                Set<String> addressesSet = Sets.newHashSet(addresses.split(","));
+                Set<String> addressesSet = Sets.newHashSet(streets.split(","));
                 double pricePerSquareMeter = resultSet.getDouble("ADVERTS.PRICEPERMETER");
                 advertisements.add(new Advertisement.AdvertBuilder(title, link)
                         .price(price)
                         .description(description)
-                        .location(location)
+                        .country(country)
+                        .city(city)
+                        .streets(addressesSet)
                         .area(area)
-                        .addresses(addressesSet)
                         .pricePerSquareMeter(pricePerSquareMeter)
                         .build());
             }

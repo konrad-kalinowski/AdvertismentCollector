@@ -9,21 +9,23 @@ public class Advertisement {
     private final String link;
     private final double price;
     private final String description;
-    private final String location;
+    private final String city;
+    private Set<String> streets;
+    private final String country;
     private final double area;
-    private Set<String> addresses;
-    private double priceForSquare;
+    private double pricePerSquareMeter;
 
 
-    private Advertisement(String title, String link, double price, String description, String location, double area, Set<String> addresses, double priceForSquare) {
+    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter) {
         this.title = title;
         this.link = link;
         this.price = price;
         this.description = description;
-        this.location = location;
+        this.country = country;
+        this.city = city;
         this.area = area;
-        this.addresses = addresses == null ? Collections.EMPTY_SET : this.addresses;
-        this.priceForSquare = priceForSquare;
+        this.streets = streets == null ? Collections.EMPTY_SET : this.streets;
+        this.pricePerSquareMeter = pricePerSquareMeter;
     }
 
     public static AdvertBuilder builder(String title, String link) {
@@ -46,8 +48,8 @@ public class Advertisement {
         return description;
     }
 
-    public String getLocation() {
-        return location;
+    public String getCity() {
+        return city;
     }
 
     public double getArea() {
@@ -55,15 +57,19 @@ public class Advertisement {
     }
 
     public double getPricePerSquareMeter() {
-        return priceForSquare;
+        return pricePerSquareMeter;
     }
 
-    public void setpossibleaddresses(Set<String> locationInDesc) {
-        this.addresses = locationInDesc;
+    public String getCountry() {
+        return country;
     }
 
-    public Set<String> getAddresses() {
-        return addresses;
+    public void setPossibleAddresses(Set<String> locationInDesc) {
+        this.streets = locationInDesc;
+    }
+
+    public Set<String> getStreets() {
+        return streets;
     }
 
     public static class AdvertBuilder {
@@ -71,9 +77,10 @@ public class Advertisement {
         private final String link;
         private double price;
         private String description;
-        private String location;
+        private Set<String> streets;
+        private String city;
+        private String country;
         private double area;
-        private Set<String> addresses;
         private Double
                 pricePerSquareMeter;
 
@@ -92,8 +99,12 @@ public class Advertisement {
             return this;
         }
 
-        public AdvertBuilder location(String location) {
-            this.location = location;
+        public AdvertBuilder city(String city) {
+            this.city = city;
+            return this;
+        }
+        public AdvertBuilder country(String country){
+            this.country = country;
             return this;
         }
 
@@ -103,8 +114,8 @@ public class Advertisement {
 
         }
 
-        public AdvertBuilder addresses(Set<String> addresses) {
-            this.addresses = addresses;
+        public AdvertBuilder streets(Set<String> streets) {
+            this.streets = streets;
             return this;
         }
 
@@ -119,7 +130,7 @@ public class Advertisement {
             } else {
                 priceForSquare = this.pricePerSquareMeter;
             }
-            return new Advertisement(title, link, price, description, location, area, addresses, priceForSquare);
+            return new Advertisement(title, link, price, description, streets, country, city, area, priceForSquare);
         }
 
         public AdvertBuilder pricePerSquareMeter(Double pricePerSquareMeter) {
@@ -135,7 +146,7 @@ public class Advertisement {
                 ", link='" + link + '\'' +
                 ", price=" + price +
                 ", description='" + description + '\'' +
-                ", location='" + location + '\'' +
+                ", city='" + city + '\'' +
                 ", area=" + area +
                 '}';
     }

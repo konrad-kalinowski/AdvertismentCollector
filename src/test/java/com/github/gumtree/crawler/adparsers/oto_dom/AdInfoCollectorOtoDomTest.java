@@ -30,7 +30,7 @@ class AdInfoCollectorOtoDomTest {
         Advertisement advertisement = adInfoCollectorOtoDom.collectInfo(file);
 
         Assertions.assertThat(advertisement.getPrice()).isEqualTo(255000);
-        Assertions.assertThat(advertisement.getLocation()).isEqualTo("Kraków, Ugorek");
+        Assertions.assertThat(advertisement.getCity()).isEqualTo("");
         Assertions.assertThat(advertisement.getTitle()).isEqualTo("Wszędzie blisko- piękny widok");
         Assertions.assertThat(advertisement.getArea()).isEqualTo(36.6);
 

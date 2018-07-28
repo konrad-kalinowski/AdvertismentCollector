@@ -31,11 +31,11 @@ public class AdInfoCollectorOlx implements AdInfoCollector {
 
     public Advertisement collectInfo(File file) {
         Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo(document);
+        return collectAdInfo("", "", document);
     }
 
     @Override
-    public Advertisement collectAdInfo(Document document) {
+    public Advertisement collectAdInfo(String country, String city, Document document) {
         String title = document.title();
         document.outputSettings().escapeMode(xhtml);
         String priceText = document.select("div.price-label > strong").first().text();
@@ -44,11 +44,11 @@ public class AdInfoCollectorOlx implements AdInfoCollector {
         String areaText = document.select("th:contains(Powierzchnia) ~ td").text().replace(" m²", "");
         double area = StringUtils.isBlank(areaText) ? VALUE_NOT_SET : ValueParsers.parseValue(areaText);
         String descriptionText = document.select("#textContent").text();
-        String location = document.select("div [class=offer-titlebox__details] > a").text();
         return new Advertisement.AdvertBuilder(title, document.location())
                 .area(area)
                 .description(descriptionText)
-                .location(location)
+                .country(country)
+                .city(city)
                 .price(price)
                 .build();
     }

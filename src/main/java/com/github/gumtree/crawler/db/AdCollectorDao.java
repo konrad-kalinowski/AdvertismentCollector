@@ -80,16 +80,17 @@ public class AdCollectorDao {
     }
 
     public void addAdvert(Advertisement advertisement) {
-        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?)";
+        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?, ?)";
         try (PreparedStatement statement = con.prepareStatement(query)) {
             statement.setString(1, advertisement.getTitle());
             statement.setString(2, advertisement.getLink());
             statement.setDouble(3, advertisement.getPrice());
             statement.setString(4, advertisement.getDescription());
-            statement.setString(5, advertisement.getLocation());
-            statement.setDouble(6, advertisement.getArea());
-            statement.setString(7, advertisement.getAddresses().stream().collect(Collectors.joining(",")));
-            statement.setDouble(8, advertisement.getPricePerSquareMeter());
+            statement.setString(5, advertisement.getCountry());
+            statement.setString(6, advertisement.getCity());
+            statement.setString(7, advertisement.getStreets().stream().collect(Collectors.joining(",")));
+            statement.setDouble(8, advertisement.getArea());
+            statement.setDouble(9, advertisement.getPricePerSquareMeter());
             statement.executeUpdate();
 
         } catch (SQLException e) {

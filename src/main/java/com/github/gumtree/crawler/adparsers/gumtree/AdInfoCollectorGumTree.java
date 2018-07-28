@@ -34,12 +34,12 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
 
     public Advertisement collectInfo(File file) {
         Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo(document);
+        return collectAdInfo("", "", document);
 
     }
 
     @Override
-    public Advertisement collectAdInfo(Document document) {
+    public Advertisement collectAdInfo(String country, String city, Document document) {
         String title = document.title();
         document.outputSettings().escapeMode(xhtml);
         Element priceElement = document.select("div[class=price]").first();
@@ -49,11 +49,11 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
         double area = StringUtils.isBlank(areaElement.text()) ? VALUE_NOT_SET : ValueParsers.parseValue(areaElement.text());
         Elements descriptionElement = document.select("div[class=description] span[class=pre]");
         String description = descriptionElement.text();
-        String location = document.select("div[class=attribute] span:contains(Lokalizacja) ~ span").text();
         return new Advertisement.AdvertBuilder(title, document.location())
                 .area(area)
                 .description(description)
-                .location(location)
+                .country(country)
+                .city(city)
                 .price(price)
                 .build();
     }
