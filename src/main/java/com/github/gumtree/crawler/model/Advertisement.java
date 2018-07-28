@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 public class Advertisement {
+    public static final double VALUE_NOT_SET = Double.MIN_VALUE;
     private final String title;
     private final String link;
     private final double price;
@@ -68,12 +69,13 @@ public class Advertisement {
     public static class AdvertBuilder {
         private final String title;
         private final String link;
-        private double priceForSquare;
         private double price;
         private String description;
         private String location;
         private double area;
         private Set<String> addresses;
+        private Double
+                pricePerSquareMeter;
 
         public AdvertBuilder(String title, String link) {
             this.title = title;
@@ -101,20 +103,29 @@ public class Advertisement {
 
         }
 
-        public AdvertBuilder pricePerSquareMeter(double priceForSquare) {
-            this.priceForSquare = priceForSquare;
-            return this;
-        }
-
         public AdvertBuilder addresses(Set<String> addresses) {
             this.addresses = addresses;
             return this;
         }
 
         public Advertisement build() {
+            double priceForSquare;
+            if (this.pricePerSquareMeter == null) {
+                if (area == 0d || area == VALUE_NOT_SET) {
+                    priceForSquare = VALUE_NOT_SET;
+                } else {
+                    priceForSquare = price / area;
+                }
+            } else {
+                priceForSquare = this.pricePerSquareMeter;
+            }
             return new Advertisement(title, link, price, description, location, area, addresses, priceForSquare);
         }
 
+        public AdvertBuilder pricePerSquareMeter(Double pricePerSquareMeter) {
+            this.pricePerSquareMeter = pricePerSquareMeter;
+            return this;
+        }
     }
 
     @Override

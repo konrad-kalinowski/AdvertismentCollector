@@ -3,19 +3,23 @@ package com.github.gumtree.crawler.adparsers.oto_dom;
 import com.github.gumtree.crawler.adparsers.AdInfoCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
+import com.github.gumtree.crawler.adparsers.ValueParsers;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 
+import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
 public class AdInfoCollectorOtoDom implements AdInfoCollector {
+    private static final Logger log = LoggerFactory.getLogger(AdInfoCollectorOtoDom.class);
 
     private static JsoupProvider jsoupProvider;
 
@@ -41,18 +45,16 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
         document.outputSettings().escapeMode(xhtml);
         String priceText = document.select("strong[class=box-price-value] ").first().text();
         String text = priceText.replace("zł", "").replaceAll("\\h+", "");
-        double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : Double.MIN_VALUE;
+        double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : VALUE_NOT_SET;
         String areaText = document.select("div[class=area-lane] span[class=big]").text().replace(" m²", "");
-        double area = StringUtils.isNumeric(areaText) ? Double.parseDouble(areaText) : Double.MIN_VALUE;
+        double area = ValueParsers.parseValue(areaText);
         String description = document.select("div[itemprop=description]").text();
         String location = document.select("p[class=address-text]").first().text();
-        double priceForSquare = area/price;
         return Advertisement.builder(title, document.location())
                 .area(area)
                 .location(location)
                 .description(description)
                 .price(price)
-                .pricePerSquareMeter(priceForSquare)
                 .build();
     }
 }

@@ -23,19 +23,31 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="aa9ac13a-24fc-41b8-9809-c1cf833a1b11">
+        <schema name="adverts" object-types="column, constraint, function, index, procedure, table, dataset trigger, view" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="aa9ac13a-24fc-41b8-9809-c1cf833a1b11">
-      <console name="local" type="STANDARD" />
+      <console name="local" type="STANDARD"><![CDATA[select link, count(*) from ADVERTS
+where link like '%' 
+group by link order by count(*) desc;]]></console>
       <console name="local 1" type="STANDARD" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="aa9ac13a-24fc-41b8-9809-c1cf833a1b11" />
   </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-list connection-id="aa9ac13a-24fc-41b8-9809-c1cf833a1b11" dataset="adverts.ADVERTS" active-filter-id="" />
+  </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
+  </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/skrypt.sql" connection-id="aa9ac13a-24fc-41b8-9809-c1cf833a1b11" session-id="MAIN" current-schema="adverts" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
@@ -53,7 +65,9 @@
     <filters />
   </component>
   <component name="DBNavigator.Project.ScriptExecutionManager" clear-outputs="true">
-    <recently-used-interfaces />
+    <recently-used-interfaces>
+      <mapping database-type="MYSQL" interface-id="DEFAULT" />
+    </recently-used-interfaces>
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
@@ -70,11 +84,11 @@
           <url-type value="DATABASE" />
           <host value="localhost" />
           <port value="3306" />
-          <database value="mysql" />
+          <database value="adverts" />
           <os-authentication value="false" />
           <empty-password value="false" />
-          <user value="root" />
-          <password value="Y2hhbmdlaXQ=" />
+          <user value="advertcollector" />
+          <password value="cGFzc3dvcmQ=" />
         </database>
         <properties>
           <auto-commit value="false" />

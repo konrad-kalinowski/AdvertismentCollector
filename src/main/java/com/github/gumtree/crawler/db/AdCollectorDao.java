@@ -4,20 +4,18 @@ import com.github.gumtree.crawler.db.mappers.AdvertisementMapper;
 import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
-import org.h2.tools.Server;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,10 +28,12 @@ public class AdCollectorDao {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AdCollectorDao.class);
     private static final String DUMP_FILE = "dump.sql";
 
-    private Server tcpServer;
-    private Server webServer;
-    private String url;
     private Connection con;
+
+    @Autowired
+    public AdCollectorDao(Connection con) {
+        this.con = con;
+    }
 
     @PostConstruct
     public void initialize() {
@@ -41,15 +41,7 @@ public class AdCollectorDao {
     }
 
     public void initialize(String fileName) {
-        String paramsString = "-baseDir /tmp/h2-test -tcpPort 8081 -tcpAllowOthers";
-        String[] dbParams = paramsString.split(" ");
         try {
-            tcpServer = Server.createTcpServer(dbParams).start();
-            webServer = Server.createWebServer("-webAllowOthers", "-webPort", "8082").start();
-            url = String.format("jdbc:h2:%s/test", tcpServer.getURL());
-            System.out.println(tcpServer.getStatus());
-            System.out.println(webServer.getStatus());
-            con = DriverManager.getConnection(url, "sa", "");
             importSql(fileName);
 
         } catch (Exception e) {
@@ -67,9 +59,11 @@ public class AdCollectorDao {
         }
         String[] queries = stringBuilder.toString().split(";");
         for (String query : queries) {
-            Statement st = con.createStatement();
-            st.executeUpdate(query);
-            st.close();
+            if (StringUtils.isNotBlank(query)) {
+                Statement st = con.createStatement();
+                st.executeUpdate(query);
+                st.close();
+            }
         }
     }
 
@@ -77,23 +71,16 @@ public class AdCollectorDao {
     public void close() {
         try {
             if (con != null) {
-                dumpToFile(new File(DUMP_FILE));
                 con.close();
             }
         } catch (SQLException e) {
             log.error("Cannot close connection. ", e);
         }
-        if (tcpServer != null) {
-            tcpServer.stop();
-        }
-        if (webServer != null) {
-            webServer.stop();
-        }
 
     }
 
     public void addAdvert(Advertisement advertisement) {
-        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?)";
+        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?)";
         try (PreparedStatement statement = con.prepareStatement(query)) {
             statement.setString(1, advertisement.getTitle());
             statement.setString(2, advertisement.getLink());
@@ -102,6 +89,7 @@ public class AdCollectorDao {
             statement.setString(5, advertisement.getLocation());
             statement.setDouble(6, advertisement.getArea());
             statement.setString(7, advertisement.getAddresses().stream().collect(Collectors.joining(",")));
+            statement.setDouble(8, advertisement.getPricePerSquareMeter());
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -126,16 +114,6 @@ public class AdCollectorDao {
             return mapper.map(resultSet);
         } catch (SQLException e) {
             throw new IllegalStateException("Query " + query + "execution failed", e);
-        }
-    }
-
-    public void dumpToFile(File file) {
-
-        try (PreparedStatement statement = con.prepareStatement("SCRIPT TO ?")) {
-            statement.setString(1, file.getAbsolutePath());
-            statement.executeQuery();
-        } catch (SQLException e) {
-            log.error("Failed to add advert.", e);
         }
     }
 

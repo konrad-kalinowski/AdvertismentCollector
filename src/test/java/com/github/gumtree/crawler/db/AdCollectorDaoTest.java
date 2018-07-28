@@ -10,7 +10,7 @@ class AdCollectorDaoTest {
 
     @Test
     void addAdvert() {
-        AdCollectorDao adCollectorDao = new AdCollectorDao();
+        AdCollectorDao adCollectorDao = new AdCollectorDao(null);
         adCollectorDao.initialize();
         adCollectorDao.addAdvert(new Advertisement.AdvertBuilder("Pokoje do wynajecia", "www.gumtree.pl").build());
         List<Advertisement> advertisements = adCollectorDao.showAdverts();

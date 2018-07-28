@@ -3,6 +3,7 @@ package com.github.gumtree.crawler.adparsers.gumtree;
 import com.github.gumtree.crawler.adparsers.AdInfoCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
+import com.github.gumtree.crawler.adparsers.ValueParsers;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 
+import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
@@ -30,7 +32,7 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
     }
 
 
-    public Advertisement collectInfo(File file){
+    public Advertisement collectInfo(File file) {
         Document document = jsoupProvider.parseFile(file);
         return collectAdInfo(document);
 
@@ -42,19 +44,17 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
         document.outputSettings().escapeMode(xhtml);
         Element priceElement = document.select("div[class=price]").first();
         String text = priceElement.text().replace(" zł", "").replaceAll("\\h+", "");
-        double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : Double.MIN_VALUE;
+        double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : VALUE_NOT_SET;
         Elements areaElement = document.select("div[class=attribute] span:contains(Wielkość (m2)) ~ span");
-        double area = StringUtils.isBlank(areaElement.text()) ? Double.MIN_VALUE : Double.parseDouble(areaElement.text());
+        double area = StringUtils.isBlank(areaElement.text()) ? VALUE_NOT_SET : ValueParsers.parseValue(areaElement.text());
         Elements descriptionElement = document.select("div[class=description] span[class=pre]");
         String description = descriptionElement.text();
         String location = document.select("div[class=attribute] span:contains(Lokalizacja) ~ span").text();
-        double pricePerSquareMeter = price/area;
         return new Advertisement.AdvertBuilder(title, document.location())
                 .area(area)
                 .description(description)
                 .location(location)
                 .price(price)
-                .pricePerSquareMeter(pricePerSquareMeter)
                 .build();
     }
 

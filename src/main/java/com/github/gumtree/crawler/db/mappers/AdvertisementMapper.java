@@ -29,12 +29,14 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 double area = resultSet.getDouble("ADVERTS.AREA");
                 String addresses = resultSet.getString("ADVERTS.ADDRESSES");
                 Set<String> addressesSet = Sets.newHashSet(addresses.split(","));
+                double pricePerSquareMeter = resultSet.getDouble("ADVERTS.PRICEPERMETER");
                 advertisements.add(new Advertisement.AdvertBuilder(title, link)
                         .price(price)
                         .description(description)
                         .location(location)
                         .area(area)
                         .addresses(addressesSet)
+                        .pricePerSquareMeter(pricePerSquareMeter)
                         .build());
             }
         } catch (SQLException e) {

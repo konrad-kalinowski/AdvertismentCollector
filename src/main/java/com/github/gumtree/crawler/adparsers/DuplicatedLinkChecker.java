@@ -4,6 +4,9 @@ import com.github.gumtree.crawler.model.Advertisement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,10 +34,15 @@ public class DuplicatedLinkChecker implements OnBatchReadyListener {
     }
 
     public boolean isAlreadyInDB(String linkToCheck) {
-        boolean alreadyExists = uniqueLinks.contains(linkToCheck);
-        if (alreadyExists) {
-            log.debug("Found duplicated link {}", linkToCheck);
+        try {
+            String decodedLink = URLDecoder.decode(linkToCheck, StandardCharsets.UTF_8.toString());
+            boolean alreadyExists = uniqueLinks.contains(decodedLink);
+            if (alreadyExists) {
+                log.debug("Found duplicated link {}", decodedLink);
+            }
+            return alreadyExists;
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Failed to decode link " + linkToCheck, e);
         }
-        return alreadyExists;
     }
 }

@@ -24,16 +24,15 @@ class AdInfoCollectorOtoDomTest {
 
         AdInfoCollectorOtoDom adInfoCollectorOtoDom = new AdInfoCollectorOtoDom(jsoupeSpy);
 
-        URL resource = AdListLinkCollectorOtoDomTest.class.getResource("/oto_dom_single_advert.html");
+        URL resource = AdListLinkCollectorOtoDomTest.class.getResource("/test_page_otodom.html");
         File file = new File(resource.toURI());
 
         Advertisement advertisement = adInfoCollectorOtoDom.collectInfo(file);
 
-        Assertions.assertThat(advertisement.getPrice()).isEqualTo(267000);
-        Assertions.assertThat(advertisement.getLocation()).isEqualTo("Kraków, Bieńczyce, Józefa Strusia");
-        Assertions.assertThat(advertisement.getDescription()).startsWith("Oferuję Państwu mieszk").endsWith("E-mail: Jan Kowalski");
-        Assertions.assertThat(advertisement.getTitle()).isEqualTo("Sprzedam mieszkanie 44m2, 3 pok. balkon, Strusia");
-        Assertions.assertThat(advertisement.getArea()).isEqualTo(44.0);
+        Assertions.assertThat(advertisement.getPrice()).isEqualTo(255000);
+        Assertions.assertThat(advertisement.getLocation()).isEqualTo("Kraków, Ugorek");
+        Assertions.assertThat(advertisement.getTitle()).isEqualTo("Wszędzie blisko- piękny widok");
+        Assertions.assertThat(advertisement.getArea()).isEqualTo(36.6);
 
 
 
