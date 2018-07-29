@@ -6,7 +6,6 @@ import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
 import com.github.gumtree.crawler.model.Coordinates;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -82,7 +81,8 @@ public class AdCollectorDao {
     }
 
     public void addAdvert(Advertisement advertisement) {
-        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?,?,?)";
+        String query = "INSERT INTO ADVERTS(TITLE, LINK, PRICE, DESCRIPTION, COUNTRY, CITY, STREETS, AREA, PRICEPERMETER, COORDINATES)" +
+                " VALUES(?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement statement = con.prepareStatement(query)) {
             statement.setString(1, advertisement.getTitle());
             statement.setString(2, advertisement.getLink());
@@ -114,10 +114,17 @@ public class AdCollectorDao {
         }
     }
 
-    public List<Advertisement> showAdverts() {
-        return executeQuery(String.format("SELECT * FROM ADVERTS"), new AdvertisementMapper());
+    public List<Advertisement> showAdverts(int startId, int limit) {
+        String template = "SELECT * FROM ADVERTS WHERE ID > ? limit ?";
+        try (PreparedStatement statement = con.prepareStatement(template)) {
+            statement.setInt(1, startId);
+            statement.setInt(2, limit);
+            ResultSet resultSet = statement.executeQuery();
+            return new AdvertisementMapper().map(resultSet);
+        } catch (SQLException e) {
+            throw new IllegalStateException("Query execution failed", e);
+        }
     }
-
 
     private <T> List<T> executeQuery(String query, ResultSetMapper<T> mapper) {
         try (Statement statement = con.createStatement()) {

@@ -43,9 +43,8 @@ public class AppConfiguration {
                                  @Value("${database.user}") String user,
                                  @Value("${database.password}") String password
     ) {
-        String url = String.format("jdbc:mysql://%s:%s/%s", dbHost, dbPort, dbName);
+        String url = String.format("jdbc:mysql://%s:%s/%s?character_set_server=utf8mb4&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", dbHost, dbPort, dbName);
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
             return DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
             throw new RuntimeException("Failed to connect", e);

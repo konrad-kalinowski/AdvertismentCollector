@@ -23,6 +23,7 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
 
         try {
             while (resultSet.next()) {
+                int id = resultSet.getInt("ADVERTS.ID");
                 String title = resultSet.getString("ADVERTS.TITLE");
                 String link = resultSet.getString("ADVERTS.LINK");
                 double price = resultSet.getDouble("ADVERTS.PRICE");
@@ -34,13 +35,14 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 Set<String> addressesSet = Sets.newHashSet(streets.split(","));
                 double pricePerSquareMeter = resultSet.getDouble("ADVERTS.PRICEPERMETER");
                 String coordinatesText = resultSet.getString("ADVERTS.COORDINATES");
-                String[] split = coordinatesText.split(",");
-                Coordinates coordinates= Coordinates.EMPTY_COORDINATES;
-                if (split.length > 1) {
+                Coordinates coordinates = Coordinates.EMPTY_COORDINATES;
+                if (!coordinatesText.equals("null,null")) {
+                    String[] split = coordinatesText.split(",");
                     coordinates = new Coordinates(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
                 }
 
                 advertisements.add(new Advertisement.AdvertBuilder(title, link)
+                        .id(id)
                         .price(price)
                         .description(description)
                         .country(country)

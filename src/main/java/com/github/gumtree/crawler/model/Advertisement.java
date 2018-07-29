@@ -7,6 +7,8 @@ import java.util.Set;
 
 public class Advertisement {
     public static final double VALUE_NOT_SET = Double.MIN_VALUE;
+
+    private final Integer id;
     private final String title;
     private final String link;
     private final double price;
@@ -19,15 +21,29 @@ public class Advertisement {
     private Coordinates coordinates;
 
 
-    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter, Coordinates coordinates) {
+    private Advertisement(String title, String link,
+                          double price, String description,
+                          Set<String> streets, String country,
+                          String city, double area,
+                          double pricePerSquareMeter, Coordinates coordinates) {
+        this(null,title,link,price,description,city,streets,country, area, pricePerSquareMeter,coordinates);
+    }
+
+    public Advertisement(Integer id, String title,
+                         String link, double price,
+                         String description, String city,
+                         Set<String> streets, String country,
+                         double area, double pricePerSquareMeter,
+                         Coordinates coordinates) {
+        this.id = id;
         this.title = title;
         this.link = link;
         this.price = price;
         this.description = description;
-        this.country = country;
         this.city = city;
+        this.streets = streets;
+        this.country = country;
         this.area = area;
-        this.streets = streets == null ? Collections.EMPTY_SET : this.streets;
         this.pricePerSquareMeter = pricePerSquareMeter;
         this.coordinates = coordinates;
     }
@@ -80,9 +96,14 @@ public class Advertisement {
         return coordinates;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public void setCoodrinates(Coordinates coodrinates) {
         this.coordinates = coodrinates;
     }
+
 
     public static class AdvertBuilder {
         private final String title;
@@ -95,6 +116,7 @@ public class Advertisement {
         private double area;
         private Double pricePerSquareMeter;
         private Coordinates coordinates;
+        private Integer id;
 
         public AdvertBuilder(String title, String link) {
             this.title = title;
@@ -143,7 +165,7 @@ public class Advertisement {
             } else {
                 priceForSquare = this.pricePerSquareMeter;
             }
-            return new Advertisement(title, link, price, description, streets, country, city, area, priceForSquare, coordinates);
+            return new Advertisement(id, title, link, price, description, city, streets, country, area, priceForSquare, coordinates);
         }
 
         public AdvertBuilder pricePerSquareMeter(Double pricePerSquareMeter) {
@@ -153,6 +175,11 @@ public class Advertisement {
 
         public AdvertBuilder coordinates(Coordinates coordinates) {
             this.coordinates = coordinates;
+            return this;
+        }
+
+        public AdvertBuilder id(Integer id) {
+            this.id = id;
             return this;
         }
     }
