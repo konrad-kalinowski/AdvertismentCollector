@@ -2,6 +2,7 @@ package com.github.gumtree.crawler.adparsers;
 
 import com.github.gumtree.crawler.db.AdvertsUploader;
 import com.github.gumtree.crawler.model.Advertisement;
+import com.github.gumtree.crawler.model.Coordinates;
 import com.github.gumtree.crawler.model.StreetType;
 import com.github.gumtree.crawler.nominatim.NominatinClient;
 import com.github.gumtree.crawler.nominatim.model.SearchResult;
@@ -42,7 +43,9 @@ public class LocationEnricher implements OnBatchReadyListener {
             if (!advertisement.getStreets().isEmpty()) {
                 String street = advertisement.getStreets().iterator().next();
                 List<SearchResult> coordinates = nominatinClient.findCoordinates(street, advertisement.getCity(), advertisement.getCountry());
-                advertisement.setCoodrinates(coordinates.get(0).getLatitude(), coordinates.get(0).getLongtitude());
+                advertisement.setCoodrinates(new Coordinates(coordinates.get(0).getLongtitude(), coordinates.get(0).getLatitude()));
+            } else {
+                advertisement.setCoodrinates(Coordinates.EMPTY_COORDINATES);
             }
         }
         advertsUploader.uploadAdverts(batch);

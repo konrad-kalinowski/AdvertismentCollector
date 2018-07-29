@@ -16,10 +16,10 @@ public class Advertisement {
     private final String country;
     private final double area;
     private double pricePerSquareMeter;
-    private Pair<Double, Double> coordinates;
+    private Coordinates coordinates;
 
 
-    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter, Pair<Double, Double> coordinates) {
+    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter, Coordinates coordinates) {
         this.title = title;
         this.link = link;
         this.price = price;
@@ -76,12 +76,12 @@ public class Advertisement {
         return streets;
     }
 
-    public Pair<Double, Double> getCoordinates() {
+    public Coordinates getCoordinates() {
         return coordinates;
     }
 
-    public void setCoodrinates(double latitude, double longtitude) {
-        this.coordinates = Pair.of(latitude, longtitude);
+    public void setCoodrinates(Coordinates coodrinates) {
+        this.coordinates = coodrinates;
     }
 
     public static class AdvertBuilder {
@@ -94,7 +94,7 @@ public class Advertisement {
         private String country;
         private double area;
         private Double pricePerSquareMeter;
-        private Pair<Double, Double> coordinates;
+        private Coordinates coordinates;
 
         public AdvertBuilder(String title, String link) {
             this.title = title;
@@ -151,7 +151,7 @@ public class Advertisement {
             return this;
         }
 
-        public AdvertBuilder coordinates(Pair<Double, Double> coordinates) {
+        public AdvertBuilder coordinates(Coordinates coordinates) {
             this.coordinates = coordinates;
             return this;
         }

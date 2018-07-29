@@ -1,6 +1,7 @@
 package com.github.gumtree.crawler.db.mappers;
 
 import com.github.gumtree.crawler.model.Advertisement;
+import com.github.gumtree.crawler.model.Coordinates;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -28,13 +29,17 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 String description = resultSet.getString("ADVERTS.DESCRIPTION");
                 String country = resultSet.getString("ADVERTS.COUNTRY");
                 String city = resultSet.getString("ADVERTS.CITY");
-                String streets = resultSet.getString("ADVERTS.ADDRESSES");
+                String streets = resultSet.getString("ADVERTS.STREETS");
                 double area = resultSet.getDouble("ADVERTS.AREA");
                 Set<String> addressesSet = Sets.newHashSet(streets.split(","));
                 double pricePerSquareMeter = resultSet.getDouble("ADVERTS.PRICEPERMETER");
                 String coordinatesText = resultSet.getString("ADVERTS.COORDINATES");
                 String[] split = coordinatesText.split(",");
-                Pair<Double, Double> coordinates = Pair.of(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+                Coordinates coordinates= Coordinates.EMPTY_COORDINATES;
+                if (split.length > 1) {
+                    coordinates = new Coordinates(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+                }
+
                 advertisements.add(new Advertisement.AdvertBuilder(title, link)
                         .price(price)
                         .description(description)
@@ -45,6 +50,7 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                         .pricePerSquareMeter(pricePerSquareMeter)
                         .coordinates(coordinates)
                         .build());
+
             }
         } catch (SQLException e) {
             log.error("Failed while mapping to advertisement list", e);

@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
+
+
 
 @SpringBootApplication
 public class AdCollectorApp implements CommandLineRunner {
@@ -30,8 +33,8 @@ public class AdCollectorApp implements CommandLineRunner {
     public void run(String... args) {
         AdvertSearchSpec advertSearchSpec = new AdvertSearchSpec("Kraków", "Poland",
                 "https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/krakow/v1c9073l3200208p1",
-                "https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/krakow/v1c9073l3200208p1",
-                "https://www.gumtree.pl/s-mieszkania-i-domy-sprzedam-i-kupie/krakow/v1c9073l3200208p1");
+                "https://www.olx.pl/nieruchomosci/mieszkania/sprzedaz/krakow/",
+                "https://www.otodom.pl/sprzedaz/mieszkanie/krakow/?search%5Bdist%5D=0&search%5Bsubregion_id%5D=410&search%5Bcity_id%5D=38");
         AdLinks advertLinks = compositeLinksCollector.getAdvertLinks(advertSearchSpec, 1);
 
         batchAdInfoCollector.collectAdvertsDetails(advertLinks);

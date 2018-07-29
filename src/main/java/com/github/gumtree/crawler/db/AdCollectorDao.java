@@ -4,6 +4,7 @@ import com.github.gumtree.crawler.db.mappers.AdvertisementMapper;
 import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
+import com.github.gumtree.crawler.model.Coordinates;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
@@ -92,11 +93,11 @@ public class AdCollectorDao {
             statement.setString(7, advertisement.getStreets().stream().collect(Collectors.joining(",")));
             statement.setDouble(8, advertisement.getArea());
             statement.setDouble(9, advertisement.getPricePerSquareMeter());
-            Pair<Double, Double> coordinates = advertisement.getCoordinates();
+            Coordinates coordinates = advertisement.getCoordinates();
             String serializedCoordinates = "";
             if (coordinates != null) {
 
-                serializedCoordinates = coordinates.getLeft() + "," + advertisement.getCoordinates().getRight();
+                serializedCoordinates = coordinates.getLongitude() + "," + advertisement.getCoordinates().getLatitude();
             }
             statement.setString(10, serializedCoordinates);
             statement.executeUpdate();
