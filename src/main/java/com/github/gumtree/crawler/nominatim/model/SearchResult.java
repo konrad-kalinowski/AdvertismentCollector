@@ -10,9 +10,9 @@ public class SearchResult {
     @JsonProperty("boundingBox")
     private List<String> boundingBox;
     @JsonProperty("lat")
-    private String latitude;
-    @JsonProperty("lontitude")
-    private double lontitude;
+    private double latitude;
+    @JsonProperty("lon")
+    private double longtitude;
     @JsonProperty("display_name")
     private String displayName;
 
@@ -24,20 +24,20 @@ public class SearchResult {
         this.boundingBox = boundingBox;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLontitude() {
-        return lontitude;
+    public double getLongtitude() {
+        return longtitude;
     }
 
-    public void setLontitude(double lontitude) {
-        this.lontitude = lontitude;
+    public void setLongtitude(double longtitude) {
+        this.longtitude = longtitude;
     }
 
     public String getDisplayName() {
@@ -53,7 +53,7 @@ public class SearchResult {
         return "SearchResult{" +
                 "boundingBox=" + boundingBox +
                 ", latitude='" + latitude + '\'' +
-                ", lontitude='" + lontitude + '\'' +
+                ", longtitude='" + longtitude + '\'' +
                 ", displayName='" + displayName + '\'' +
                 '}';
     }

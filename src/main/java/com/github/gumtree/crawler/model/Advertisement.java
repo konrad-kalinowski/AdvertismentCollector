@@ -1,5 +1,7 @@
 package com.github.gumtree.crawler.model;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -14,9 +16,10 @@ public class Advertisement {
     private final String country;
     private final double area;
     private double pricePerSquareMeter;
+    private Pair<Double, Double> coordinates;
 
 
-    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter) {
+    private Advertisement(String title, String link, double price, String description, Set<String> streets, String country, String city, double area, double pricePerSquareMeter, Pair<Double, Double> coordinates) {
         this.title = title;
         this.link = link;
         this.price = price;
@@ -26,6 +29,7 @@ public class Advertisement {
         this.area = area;
         this.streets = streets == null ? Collections.EMPTY_SET : this.streets;
         this.pricePerSquareMeter = pricePerSquareMeter;
+        this.coordinates = coordinates;
     }
 
     public static AdvertBuilder builder(String title, String link) {
@@ -72,6 +76,14 @@ public class Advertisement {
         return streets;
     }
 
+    public Pair<Double, Double> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoodrinates(double latitude, double longtitude) {
+        this.coordinates = Pair.of(latitude, longtitude);
+    }
+
     public static class AdvertBuilder {
         private final String title;
         private final String link;
@@ -81,8 +93,8 @@ public class Advertisement {
         private String city;
         private String country;
         private double area;
-        private Double
-                pricePerSquareMeter;
+        private Double pricePerSquareMeter;
+        private Pair<Double, Double> coordinates;
 
         public AdvertBuilder(String title, String link) {
             this.title = title;
@@ -103,7 +115,8 @@ public class Advertisement {
             this.city = city;
             return this;
         }
-        public AdvertBuilder country(String country){
+
+        public AdvertBuilder country(String country) {
             this.country = country;
             return this;
         }
@@ -130,11 +143,16 @@ public class Advertisement {
             } else {
                 priceForSquare = this.pricePerSquareMeter;
             }
-            return new Advertisement(title, link, price, description, streets, country, city, area, priceForSquare);
+            return new Advertisement(title, link, price, description, streets, country, city, area, priceForSquare, coordinates);
         }
 
         public AdvertBuilder pricePerSquareMeter(Double pricePerSquareMeter) {
             this.pricePerSquareMeter = pricePerSquareMeter;
+            return this;
+        }
+
+        public AdvertBuilder coordinates(Pair<Double, Double> coordinates) {
+            this.coordinates = coordinates;
             return this;
         }
     }

@@ -5,6 +5,7 @@ import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -80,7 +81,7 @@ public class AdCollectorDao {
     }
 
     public void addAdvert(Advertisement advertisement) {
-        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?, ?)";
+        String query = "INSERT INTO ADVERTS VALUES(?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement statement = con.prepareStatement(query)) {
             statement.setString(1, advertisement.getTitle());
             statement.setString(2, advertisement.getLink());
@@ -91,11 +92,19 @@ public class AdCollectorDao {
             statement.setString(7, advertisement.getStreets().stream().collect(Collectors.joining(",")));
             statement.setDouble(8, advertisement.getArea());
             statement.setDouble(9, advertisement.getPricePerSquareMeter());
+            Pair<Double, Double> coordinates = advertisement.getCoordinates();
+            String serializedCoordinates = "";
+            if (coordinates != null) {
+
+                serializedCoordinates = coordinates.getLeft() + "," + advertisement.getCoordinates().getRight();
+            }
+            statement.setString(10, serializedCoordinates);
             statement.executeUpdate();
 
         } catch (SQLException e) {
             log.error("Failed to add advert.", e);
         }
+
     }
 
     public void addAdverts(List<Advertisement> advertisements) {

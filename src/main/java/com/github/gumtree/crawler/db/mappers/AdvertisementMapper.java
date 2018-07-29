@@ -2,6 +2,7 @@ package com.github.gumtree.crawler.db.mappers;
 
 import com.github.gumtree.crawler.model.Advertisement;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,9 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                 double area = resultSet.getDouble("ADVERTS.AREA");
                 Set<String> addressesSet = Sets.newHashSet(streets.split(","));
                 double pricePerSquareMeter = resultSet.getDouble("ADVERTS.PRICEPERMETER");
+                String coordinatesText = resultSet.getString("ADVERTS.COORDINATES");
+                String[] split = coordinatesText.split(",");
+                Pair<Double, Double> coordinates = Pair.of(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
                 advertisements.add(new Advertisement.AdvertBuilder(title, link)
                         .price(price)
                         .description(description)
@@ -39,6 +43,7 @@ public class AdvertisementMapper implements ResultSetMapper<Advertisement> {
                         .streets(addressesSet)
                         .area(area)
                         .pricePerSquareMeter(pricePerSquareMeter)
+                        .coordinates(coordinates)
                         .build());
             }
         } catch (SQLException e) {
