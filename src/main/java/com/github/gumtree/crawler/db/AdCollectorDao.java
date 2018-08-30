@@ -5,6 +5,8 @@ import com.github.gumtree.crawler.db.mappers.LinksMapper;
 import com.github.gumtree.crawler.db.mappers.ResultSetMapper;
 import com.github.gumtree.crawler.model.Advertisement;
 import com.github.gumtree.crawler.model.Coordinates;
+import com.github.gumtree.crawler.model.filter.AdvertsFilter;
+import com.github.gumtree.crawler.model.filter.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,11 +116,27 @@ public class AdCollectorDao {
         }
     }
 
-    public List<Advertisement> showAdverts(int startId, int limit) {
-        String template = "SELECT * FROM ADVERTS WHERE ID > ? limit ?";
-        try (PreparedStatement statement = con.prepareStatement(template)) {
-            statement.setInt(1, startId);
-            statement.setInt(2, limit);
+    public List<Advertisement> showAdverts(AdvertsFilter advertsFilter, int startId, int limit) {
+        String template = "SELECT * FROM ADVERTS WHERE ID > ?";
+        StringBuilder templateBuilder = new StringBuilder(template);
+        Range<Double> areaRange = advertsFilter.getAreaRange();
+        if (areaRange.getMin() != null) {
+            templateBuilder.append(" AND AREA >= ?");
+        }
+        if (areaRange.getMax() != null) {
+            templateBuilder.append(" AND AREA <= ?");
+        }
+        templateBuilder.append(" limit ?");
+        try (PreparedStatement statement = con.prepareStatement(templateBuilder.toString())) {
+            int parameterIndex = 1;
+            statement.setInt(parameterIndex++, startId);
+            if (areaRange.getMin() != null) {
+                statement.setDouble(parameterIndex++, areaRange.getMin());
+            }
+            if (areaRange.getMax() != null) {
+                statement.setDouble(parameterIndex++, areaRange.getMax());
+            }
+            statement.setInt(parameterIndex++, limit);
             ResultSet resultSet = statement.executeQuery();
             return new AdvertisementMapper().map(resultSet);
         } catch (SQLException e) {

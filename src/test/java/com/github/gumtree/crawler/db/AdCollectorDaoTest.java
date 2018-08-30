@@ -12,7 +12,7 @@ class AdCollectorDaoTest {
         AdCollectorDao adCollectorDao = new AdCollectorDao(null);
         adCollectorDao.initialize();
         adCollectorDao.addAdvert(new Advertisement.AdvertBuilder("Pokoje do wynajecia", "www.gumtree.pl").build());
-        List<Advertisement> advertisements = adCollectorDao.showAdverts(1, 10);
+        List<Advertisement> advertisements = adCollectorDao.showAdverts(null, 1, 10);
         Assertions.assertThat(advertisements).hasSize(1);
         Assertions.assertThat(advertisements.get(0).getTitle()).isEqualTo("Pokoje do wynajecia");
         Assertions.assertThat(advertisements.get(0).getCity()).isNotEqualTo("dasdada");

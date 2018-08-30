@@ -2,6 +2,8 @@ package com.github.gumtree.crawler.rest;
 
 import com.github.gumtree.crawler.db.AdCollectorDao;
 import com.github.gumtree.crawler.model.Advertisement;
+import com.github.gumtree.crawler.model.filter.AdvertsFilter;
+import com.github.gumtree.crawler.model.filter.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +23,12 @@ public class AdvertismentController {
     }
 
     @GetMapping
-    public List<Advertisement> getAdvertisment(@RequestParam(name="id", defaultValue = "0") int startId,
-                                               @RequestParam(name="limit", defaultValue = "10") int limit){
-        return adCollectorDao.showAdverts(startId, limit);
+    public List<Advertisement> getAdvertisment(@RequestParam(name = "id", defaultValue = "0") int startId,
+                                               @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                               @RequestParam(name = "areaMin", required = false) Double areaMin,
+                                               @RequestParam(name = "areaMax", required = false) Double areaMax) {
+        AdvertsFilter advertsFilter = new AdvertsFilter(new Range<Double>(areaMin, areaMax));
+        return adCollectorDao.showAdverts(advertsFilter, startId, limit);
     }
 
 }

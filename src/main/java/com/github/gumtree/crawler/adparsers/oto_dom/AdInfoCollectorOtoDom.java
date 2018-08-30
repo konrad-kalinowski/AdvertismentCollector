@@ -43,7 +43,7 @@ public class AdInfoCollectorOtoDom implements AdInfoCollector {
     public Advertisement collectAdInfo(String country, String city, Document document) {
         String title = document.select("div[class=article-offer] header h1").text();
         document.outputSettings().escapeMode(xhtml);
-        String priceText = document.select("strong[class=box-price-value] ").first().text();
+        String priceText = document.select("strong[class=box-price-value]").first().text();
         String text = priceText.replace("zł", "").replaceAll("\\h+", "");
         double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : VALUE_NOT_SET;
         String areaText = document.select("div[class=area-lane] span[class=big]").text().replace(" m²", "");
