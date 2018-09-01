@@ -43,7 +43,7 @@ public class AdCollectorDao {
         initialize("/skrypt.sql");
     }
 
-    public void initialize(String fileName) {
+    private void initialize(String fileName) {
         try {
             importSql(fileName);
 
@@ -92,7 +92,7 @@ public class AdCollectorDao {
             statement.setString(4, advertisement.getDescription());
             statement.setString(5, advertisement.getCountry());
             statement.setString(6, advertisement.getCity());
-            statement.setString(7, advertisement.getStreets().stream().collect(Collectors.joining(",")));
+            statement.setString(7, String.join(",", advertisement.getStreets()));
             statement.setDouble(8, advertisement.getArea());
             statement.setDouble(9, advertisement.getPricePerSquareMeter());
             Coordinates coordinates = advertisement.getCoordinates();
@@ -120,11 +120,23 @@ public class AdCollectorDao {
         String template = "SELECT * FROM ADVERTS WHERE ID > ?";
         StringBuilder templateBuilder = new StringBuilder(template);
         Range<Double> areaRange = advertsFilter.getAreaRange();
+        Range<Double> priceRange = advertsFilter.getPriceRange();
         if (areaRange.getMin() != null) {
             templateBuilder.append(" AND AREA >= ?");
         }
         if (areaRange.getMax() != null) {
             templateBuilder.append(" AND AREA <= ?");
+
+        }
+        if (priceRange.getMin() != null) {
+            templateBuilder.append(" AND PRICE >= ?");
+
+        }
+        if (priceRange.getMax() != null) {
+            templateBuilder.append(" AND PRICE <= ?");
+        }
+        if (StringUtils.isNotBlank(advertsFilter.getSearchQuery())) {
+            templateBuilder.append(" AND DESCRIPTION LIKE ?");
         }
         templateBuilder.append(" limit ?");
         try (PreparedStatement statement = con.prepareStatement(templateBuilder.toString())) {
@@ -136,7 +148,17 @@ public class AdCollectorDao {
             if (areaRange.getMax() != null) {
                 statement.setDouble(parameterIndex++, areaRange.getMax());
             }
-            statement.setInt(parameterIndex++, limit);
+            if (priceRange.getMin() != null) {
+                statement.setDouble(parameterIndex++, priceRange.getMin());
+            }
+            if (priceRange.getMax() != null) {
+                statement.setDouble(parameterIndex++, priceRange.getMax());
+            }
+            if (StringUtils.isNotBlank(advertsFilter.getSearchQuery())) {
+                statement.setString(parameterIndex++, "%" + advertsFilter.getSearchQuery() + "%");
+            }
+            statement.setInt(parameterIndex, limit);
+            log.info("SQL statment: {}", statement);
             ResultSet resultSet = statement.executeQuery();
             return new AdvertisementMapper().map(resultSet);
         } catch (SQLException e) {

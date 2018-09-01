@@ -26,8 +26,13 @@ public class AdvertismentController {
     public List<Advertisement> getAdvertisment(@RequestParam(name = "id", defaultValue = "0") int startId,
                                                @RequestParam(name = "limit", defaultValue = "10") int limit,
                                                @RequestParam(name = "areaMin", required = false) Double areaMin,
-                                               @RequestParam(name = "areaMax", required = false) Double areaMax) {
-        AdvertsFilter advertsFilter = new AdvertsFilter(new Range<Double>(areaMin, areaMax));
+                                               @RequestParam(name = "areaMax", required = false) Double areaMax,
+                                               @RequestParam(name = "priceMin", required = false) Double priceMin,
+                                               @RequestParam(name = "priceMax", required = false) Double priceMax,
+                                               @RequestParam(name = "q", required = false) String searchQuery) {
+        AdvertsFilter advertsFilter = new AdvertsFilter(new Range<>(areaMin, areaMax),
+                new Range<>(priceMin, priceMax),
+                searchQuery);
         return adCollectorDao.showAdverts(advertsFilter, startId, limit);
     }
 
