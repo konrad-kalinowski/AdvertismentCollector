@@ -11,12 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 
 @Service
-public class LocationEnricher implements OnBatchReadyListener {
+public class LocationEnricher {
 
     private static final Logger log = LoggerFactory.getLogger(LocationEnricher.class);
 
@@ -24,30 +27,47 @@ public class LocationEnricher implements OnBatchReadyListener {
     private final AdvertsUploader advertsUploader;
     private Map<StreetType, Set<String>> availableStreets;
     private NominatinClient nominatinClient;
+    private final BlockingQueue<Advertisement> advertsQueue;
 
 
     @Autowired
-    public LocationEnricher(LocationFinder locationFinder, AdvertsUploader advertsUploader, Map<StreetType, Set<String>> availableStreets, NominatinClient nominatinClient) {
+    public LocationEnricher(LocationFinder locationFinder,
+                            AdvertsUploader advertsUploader,
+                            Map<StreetType, Set<String>> availableStreets,
+                            NominatinClient nominatinClient,
+                            BlockingQueue<Advertisement> advertsQueue) {
         this.locationFinder = locationFinder;
         this.advertsUploader = advertsUploader;
         this.availableStreets = availableStreets;
         this.nominatinClient = nominatinClient;
+        this.advertsQueue = advertsQueue;
     }
 
-    @Override
-    public void onBatchReady(List<Advertisement> batch) {
-
-        for (Advertisement advertisement : batch) {
-            Set<String> locationInDesc = locationFinder.findLocationInDesc(availableStreets, advertisement.getDescription());
-            advertisement.setPossibleAddresses(locationInDesc);
-            if (!advertisement.getStreets().isEmpty()) {
-                String street = advertisement.getStreets().iterator().next();
-                List<SearchResult> coordinates = nominatinClient.findCoordinates(street, advertisement.getCity(), advertisement.getCountry());
-                advertisement.setCoodrinates(new Coordinates(coordinates.get(0).getLongtitude(), coordinates.get(0).getLatitude()));
-            } else {
-                advertisement.setCoodrinates(Coordinates.EMPTY_COORDINATES);
+    @PostConstruct
+    public void scheduleAdvertismentEnricher() {
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Advertisement advertisement = advertsQueue.take();
+                    enrichAndSaveAdvert(advertisement);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
+        }, "Location-Enricher").start();
+    }
+
+    public void enrichAndSaveAdvert(Advertisement advertisement) {
+        Set<String> locationInDesc = locationFinder.findLocationInDesc(availableStreets, advertisement.getDescription());
+        advertisement.setPossibleAddresses(locationInDesc);
+        if (!advertisement.getStreets().isEmpty()) {
+            String street = advertisement.getStreets().iterator().next();
+            List<SearchResult> coordinates = nominatinClient.findCoordinates(street, advertisement.getCity(), advertisement.getCountry());
+            advertisement.setCoodrinates(new Coordinates(coordinates.get(0).getLongtitude(), coordinates.get(0).getLatitude()));
+        } else {
+            advertisement.setCoodrinates(Coordinates.EMPTY_COORDINATES);
         }
-        advertsUploader.uploadAdverts(batch);
+        advertsUploader.uploadAdverts(Collections.singletonList(advertisement));
     }
 }

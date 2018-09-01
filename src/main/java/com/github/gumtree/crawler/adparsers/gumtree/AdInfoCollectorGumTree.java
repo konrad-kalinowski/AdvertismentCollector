@@ -1,29 +1,42 @@
 package com.github.gumtree.crawler.adparsers.gumtree;
 
-import com.github.gumtree.crawler.adparsers.AdInfoCollector;
+import com.github.gumtree.crawler.adparsers.AbstractAdInfoCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.adparsers.ValueParsers;
+import com.github.gumtree.crawler.model.AdLink;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import javax.annotation.PostConstruct;
+import java.util.concurrent.BlockingQueue;
 
 import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
-public class AdInfoCollectorGumTree implements AdInfoCollector {
-    private final JsoupProvider jsoupProvider;
+public class AdInfoCollectorGumTree extends AbstractAdInfoCollector {
+    private static final Logger log = LoggerFactory.getLogger(AdInfoCollectorGumTree.class);
 
     @Autowired
-    public AdInfoCollectorGumTree(JsoupProvider jsoupProvider) {
-        this.jsoupProvider = jsoupProvider;
+    public AdInfoCollectorGumTree(JsoupProvider jsoupProvider,
+                                  @Qualifier("gumtreeAdLinksQueue") BlockingQueue<AdLink> gumtreeAdLinkQueue,
+                                  BlockingQueue<Advertisement> advertisementQueue) {
+        super(jsoupProvider, gumtreeAdLinkQueue, advertisementQueue);
+    }
+
+    @PostConstruct
+    public void scheduleCollectingAdInfo() {
+       super.scheduleCollectingAdInfo("gumTreeCollector");
+
     }
 
     @Override
@@ -31,12 +44,6 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
         return advertLink.startsWith(Domain.GUMTREE_DOMAIN);
     }
 
-
-    public Advertisement collectInfo(File file) {
-        Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo("", "", document);
-
-    }
 
     @Override
     public Advertisement collectAdInfo(String country, String city, Document document) {
@@ -57,5 +64,4 @@ public class AdInfoCollectorGumTree implements AdInfoCollector {
                 .price(price)
                 .build();
     }
-
 }

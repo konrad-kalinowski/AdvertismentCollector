@@ -22,7 +22,7 @@ class AdInfoCollectorOtoDomTest {
         JsoupProvider jsoupeSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupeSpy).connect(any());
 
-        AdInfoCollectorOtoDom adInfoCollectorOtoDom = new AdInfoCollectorOtoDom(jsoupeSpy);
+        AdInfoCollectorOtoDom adInfoCollectorOtoDom = new AdInfoCollectorOtoDom(jsoupeSpy, null, null);
 
         URL resource = AdListLinkCollectorOtoDomTest.class.getResource("/test_page_otodom.html");
         File file = new File(resource.toURI());
@@ -33,8 +33,6 @@ class AdInfoCollectorOtoDomTest {
         Assertions.assertThat(advertisement.getCity()).isEqualTo("");
         Assertions.assertThat(advertisement.getTitle()).isEqualTo("Wszędzie blisko- piękny widok");
         Assertions.assertThat(advertisement.getArea()).isEqualTo(36.6);
-
-
 
 
     }

@@ -1,37 +1,41 @@
 package com.github.gumtree.crawler.adparsers.oto_dom;
 
-import com.github.gumtree.crawler.adparsers.AdInfoCollector;
+import com.github.gumtree.crawler.adparsers.AbstractAdInfoCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.adparsers.ValueParsers;
+import com.github.gumtree.crawler.model.AdLink;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import javax.annotation.PostConstruct;
+import java.util.concurrent.BlockingQueue;
 
 import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
-public class AdInfoCollectorOtoDom implements AdInfoCollector {
+public class AdInfoCollectorOtoDom extends AbstractAdInfoCollector {
     private static final Logger log = LoggerFactory.getLogger(AdInfoCollectorOtoDom.class);
 
-    private JsoupProvider jsoupProvider;
-
     @Autowired
-    public AdInfoCollectorOtoDom(JsoupProvider jsoupProvider) {
-        this.jsoupProvider = jsoupProvider;
+    public AdInfoCollectorOtoDom(JsoupProvider jsoupProvider,
+                                 @Qualifier("otodomAdLinksQueue") BlockingQueue<AdLink> otodomAdLinksQueue,
+                                 BlockingQueue<Advertisement> advertisementQueue) {
+        super(jsoupProvider, otodomAdLinksQueue, advertisementQueue);
     }
 
 
-    public Advertisement collectInfo(File file) {
-        Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo("", "", document);
+    @PostConstruct
+    public void scheduleCollectingAdInfo() {
+        super.scheduleCollectingAdInfo("otoDomCollector");
+
     }
 
     @Override

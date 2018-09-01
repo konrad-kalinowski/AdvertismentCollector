@@ -1,37 +1,43 @@
 package com.github.gumtree.crawler.adparsers.olx;
 
+import com.github.gumtree.crawler.adparsers.AbstractAdInfoCollector;
 import com.github.gumtree.crawler.adparsers.AdInfoCollector;
 import com.github.gumtree.crawler.adparsers.Domain;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.adparsers.ValueParsers;
+import com.github.gumtree.crawler.model.AdLink;
 import com.github.gumtree.crawler.model.Advertisement;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.concurrent.BlockingQueue;
 
 import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
-public class AdInfoCollectorOlx implements AdInfoCollector {
-    private static JsoupProvider jsoupProvider;
+public class AdInfoCollectorOlx extends AbstractAdInfoCollector {
 
     @Autowired
-    public AdInfoCollectorOlx(JsoupProvider jsoupProvider) {
-        this.jsoupProvider = jsoupProvider;
+    public AdInfoCollectorOlx(JsoupProvider jsoupProvider,
+                              @Qualifier("olxAdLinksQueue")BlockingQueue<AdLink> adLinkBlockingQueue,
+                              BlockingQueue<Advertisement> advertisementQueue) {
+        super(jsoupProvider, adLinkBlockingQueue, advertisementQueue);
+    }
+    @PostConstruct
+    public void scheduleCollectingAdInfo() {
+        super.scheduleCollectingAdInfo("olxCollector");
+
     }
 
     @Override
     public boolean canProcess(String advertLink) {
         return advertLink.startsWith(Domain.OLX_DOMAIN);
-    }
-
-    public Advertisement collectInfo(File file) {
-        Document document = jsoupProvider.parseFile(file);
-        return collectAdInfo("", "", document);
     }
 
     @Override

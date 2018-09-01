@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ public abstract class AdLinksCollector {
     protected final JsoupProvider jsoupProvider;
     private final DuplicatedLinkChecker duplicatedLinkChecker;
     protected int inactivePeriodSeconds;
+
 
     public AdLinksCollector(JsoupProvider jsoupProvider, DuplicatedLinkChecker duplicatedLinkChecker, int inactivePeriodSeconds) {
         this.jsoupProvider = jsoupProvider;

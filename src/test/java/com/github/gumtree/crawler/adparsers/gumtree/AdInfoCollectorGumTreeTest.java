@@ -22,7 +22,7 @@ class AdInfoCollectorGumTreeTest {
         JsoupProvider jsoupProviderSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupProviderSpy).connect(any());
 
-        AdInfoCollectorGumTree adInfoCollectorGumTree = new AdInfoCollectorGumTree(jsoupProviderSpy);
+        AdInfoCollectorGumTree adInfoCollectorGumTree = new AdInfoCollectorGumTree(jsoupProviderSpy, null, null);
 
         URL sectionsIo = AdListLinkCollectorGumTreeTest.class.getResource("/single-test-advert.html");
         File htmlFile = new File(sectionsIo.toURI());
@@ -35,7 +35,7 @@ class AdInfoCollectorGumTreeTest {
         Assertions.assertThat(advertisement.getPrice()).isEqualTo(expectedPrice);
         double expectedArea = 136;
         Assertions.assertThat(advertisement.getArea()).isEqualTo(expectedArea);
-        Assertions.assertThat(advertisement.getPricePerSquareMeter()).isEqualTo(expectedPrice/expectedArea);
+        Assertions.assertThat(advertisement.getPricePerSquareMeter()).isEqualTo(expectedPrice / expectedArea);
         Assertions.assertThat(advertisement.getDescription())
                 .isNotBlank()
                 .startsWith("Okazja! W ofercie apartament cztero pokojowy w ścisłym centrum Krakowa.")
