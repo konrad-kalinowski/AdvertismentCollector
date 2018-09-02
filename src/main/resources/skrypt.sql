@@ -1,3 +1,8 @@
+-- database creation
+-- CREATE USER 'advertcollector'@'localhost' IDENTIFIED BY 'password';
+-- CREATE DATABASE adverts;
+-- GRANT ALL PRIVILEGES ON adverts.* To 'advertcollector'@'localhost' IDENTIFIED BY 'password';
+
 CREATE TABLE if not exists ADVERTS(
 ID int AUTO_INCREMENT NOT NULL,
 TITLE varchar(255),

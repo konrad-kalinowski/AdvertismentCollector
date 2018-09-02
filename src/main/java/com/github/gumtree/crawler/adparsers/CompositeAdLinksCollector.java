@@ -6,11 +6,9 @@ import com.github.gumtree.crawler.nominatim.model.AdvertSearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
 
 @Service
 public class CompositeAdLinksCollector {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 public class AdLinksDispatcher {
@@ -20,14 +21,14 @@ public class AdLinksDispatcher {
     private final BlockingQueue<AdLink> otodomAdLinksQueue;
 
     @Autowired
-    public AdLinksDispatcher(@Qualifier("adLinksQueue") BlockingQueue<AdLink> allAdLinksQueue,
-                             @Qualifier("olxAdLinksQueue") BlockingQueue<AdLink> olxAdLinksQueue,
-                             @Qualifier("gumtreeAdLinksQueue") BlockingQueue<AdLink> gumtreeAdLinksQueue,
-                             @Qualifier("otodomAdLinksQueue") BlockingQueue<AdLink> otodomAdLinksQueue) {
+    public AdLinksDispatcher(@Qualifier("adLinksQueue") LinkedBlockingQueue<AdLink> allAdLinksQueue,
+                             @Qualifier("olxAdLinksQueue") LinkedBlockingQueue<AdLink> olxAdLinksQueue,
+                             @Qualifier("gumtreeAdLinksQueue") LinkedBlockingQueue<AdLink> gumtreeAdLinksQueue,
+                             @Qualifier("otoDomAdLinksQueue") LinkedBlockingQueue<AdLink> otoDomAdLinksQueue) {
         this.allAdLinksQueue = allAdLinksQueue;
         this.olxAdLinksQueue = olxAdLinksQueue;
         this.gumtreeAdLinksQueue = gumtreeAdLinksQueue;
-        this.otodomAdLinksQueue = otodomAdLinksQueue;
+        this.otodomAdLinksQueue = otoDomAdLinksQueue;
     }
 
     @PostConstruct

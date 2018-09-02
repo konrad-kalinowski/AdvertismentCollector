@@ -22,7 +22,7 @@ class AdInfoCollectorGumTreeTest {
         JsoupProvider jsoupProviderSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupProviderSpy).connect(any());
 
-        AdInfoCollectorGumTree adInfoCollectorGumTree = new AdInfoCollectorGumTree(jsoupProviderSpy, null, null);
+        AdInfoCollectorGumTree adInfoCollectorGumTree = new AdInfoCollectorGumTree(jsoupProviderSpy, null, null, 0);
 
         URL sectionsIo = AdListLinkCollectorGumTreeTest.class.getResource("/single-test-advert.html");
         File htmlFile = new File(sectionsIo.toURI());

@@ -1,4 +1,4 @@
-package com.github.gumtree.crawler.adparsers.oto_dom;
+package com.github.gumtree.crawler.adparsers.otoDom;
 
 import com.github.gumtree.crawler.adparsers.DuplicatedLinkChecker;
 import com.github.gumtree.crawler.adparsers.JsoupProvider;

@@ -1,4 +1,4 @@
-package com.github.gumtree.crawler.adparsers.oto_dom;
+package com.github.gumtree.crawler.adparsers.otoDom;
 
 import com.github.gumtree.crawler.adparsers.JsoupProvider;
 import com.github.gumtree.crawler.model.Advertisement;
@@ -22,7 +22,7 @@ class AdInfoCollectorOtoDomTest {
         JsoupProvider jsoupeSpy = spy(new JsoupProvider());
         doReturn(mock(Document.class)).when(jsoupeSpy).connect(any());
 
-        AdInfoCollectorOtoDom adInfoCollectorOtoDom = new AdInfoCollectorOtoDom(jsoupeSpy, null, null);
+        AdInfoCollectorOtoDom adInfoCollectorOtoDom = new AdInfoCollectorOtoDom(jsoupeSpy, null, null, 0);
 
         URL resource = AdListLinkCollectorOtoDomTest.class.getResource("/test_page_otodom.html");
         File file = new File(resource.toURI());

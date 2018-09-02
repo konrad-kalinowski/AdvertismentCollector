@@ -14,36 +14,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.github.gumtree.crawler.model.Advertisement.VALUE_NOT_SET;
 import static org.jsoup.nodes.Entities.EscapeMode.xhtml;
 
 @Service
 public class AdInfoCollectorGumTree extends AbstractAdInfoCollector {
+
     private static final Logger log = LoggerFactory.getLogger(AdInfoCollectorGumTree.class);
 
     @Autowired
     public AdInfoCollectorGumTree(JsoupProvider jsoupProvider,
-                                  @Qualifier("gumtreeAdLinksQueue") BlockingQueue<AdLink> gumtreeAdLinkQueue,
-                                  BlockingQueue<Advertisement> advertisementQueue) {
-        super(jsoupProvider, gumtreeAdLinkQueue, advertisementQueue);
+            @Qualifier("gumtreeAdLinksQueue") LinkedBlockingQueue<AdLink> gumtreeAdLinkQueue,
+            BlockingQueue<Advertisement> advertisementQueue,
+            @Value("${adverts.collector.inactivity.seconds:5}") int inactivityPeriodSeconds) {
+        super(jsoupProvider, gumtreeAdLinkQueue, advertisementQueue, inactivityPeriodSeconds);
     }
 
     @PostConstruct
     public void scheduleCollectingAdInfo() {
-       super.scheduleCollectingAdInfo("gumTreeCollector");
-
+        super.scheduleCollectingAdInfo("gumTreeCollector");
     }
 
     @Override
     public boolean canProcess(String advertLink) {
         return advertLink.startsWith(Domain.GUMTREE_DOMAIN);
     }
-
 
     @Override
     public Advertisement collectAdInfo(String country, String city, Document document) {
@@ -53,7 +55,8 @@ public class AdInfoCollectorGumTree extends AbstractAdInfoCollector {
         String text = priceElement.text().replace(" zł", "").replaceAll("\\h+", "");
         double price = StringUtils.isNumeric(text) ? Double.parseDouble(text) : VALUE_NOT_SET;
         Elements areaElement = document.select("div[class=attribute] span:contains(Wielkość (m2)) ~ span");
-        double area = StringUtils.isBlank(areaElement.text()) ? VALUE_NOT_SET : ValueParsers.parseValue(areaElement.text());
+        double area =
+                StringUtils.isBlank(areaElement.text()) ? VALUE_NOT_SET : ValueParsers.parseValue(areaElement.text());
         Elements descriptionElement = document.select("div[class=description] span[class=pre]");
         String description = descriptionElement.text();
         return new Advertisement.AdvertBuilder(title, document.location())

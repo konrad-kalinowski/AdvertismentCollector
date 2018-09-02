@@ -22,7 +22,7 @@ class AdInfoCollectorOlxTest {
         JsoupProvider jsoupProviderSpy = spy(new JsoupProvider());
         doReturn(mock(org.jsoup.nodes.Document.class)).when(jsoupProviderSpy).connect(any());
 
-        AdInfoCollectorOlx adInfoCollectorOlx = new AdInfoCollectorOlx(jsoupProviderSpy, null, null);
+        AdInfoCollectorOlx adInfoCollectorOlx = new AdInfoCollectorOlx(jsoupProviderSpy, null, null, 0);
         URL resource = AdInfoCollectorOlxTest.class.getResource("/olx_advert.html");
         File file = new File(resource.toURI());
         Advertisement advertisement = adInfoCollectorOlx.collectInfo(file);

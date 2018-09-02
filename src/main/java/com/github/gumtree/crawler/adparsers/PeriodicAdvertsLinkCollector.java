@@ -2,6 +2,7 @@ package com.github.gumtree.crawler.adparsers;
 
 import com.github.gumtree.crawler.model.AdLinks;
 import com.github.gumtree.crawler.nominatim.model.AdvertSearchSpec;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,18 @@ public class PeriodicAdvertsLinkCollector {
 
     @Autowired
     public PeriodicAdvertsLinkCollector(CompositeAdLinksCollector compositeAdLinksCollector,
-                                        @Value("${advers.fetcher.delay.seconds:300}") long advertsFetcherDelay) {
+                                        @Value("${adverts.fetcher.delay.seconds:300}") long advertsFetcherDelay) {
         this.compositeAdLinksCollector = compositeAdLinksCollector;
         this.advertsFetcherDelay = advertsFetcherDelay;
     }
 
     @PostConstruct
     public void initializeFetchingAdvertLinks() {
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+        Executors.newScheduledThreadPool(1,
+                new ThreadFactoryBuilder()
+                        .setNameFormat("links-collector-%s")
+                        .build())
+                .scheduleWithFixedDelay(() -> {
 
             log.info("Fetching link adverts started");
             AdvertSearchSpec advertSearchSpec = new AdvertSearchSpec("Kraków", "Poland",
